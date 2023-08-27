@@ -2,8 +2,10 @@ QT += core gui widgets
 TEMPLATE = app
 CONFIG += c++11
 SOURCES = main.cpp \
-    mainwindow.cpp
-HEADERS = mainwindow.h
+    mainwindow.cpp \
+    qnchatmessage.cpp
+HEADERS = mainwindow.h \
+    qnchatmessage.h
 
 LIBS += $$top_builddir/components/$(OBJECTS_DIR)/libcomponents.a
 INCLUDEPATH += $$top_srcdir/components/

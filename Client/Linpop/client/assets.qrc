@@ -6,5 +6,8 @@
         <file alias="add-person">assets/person-fill-add.svg</file>
         <file alias="setting">assets/list.svg</file>
         <file alias="search">assets/search.svg</file>
+        <file alias="picture">assets/image.svg</file>
+        <file alias="file">assets/file.svg</file>
+        <file alias="emoji">assets/emoji.svg</file>
     </qresource>
 </RCC>
