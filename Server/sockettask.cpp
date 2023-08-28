@@ -4,6 +4,7 @@
 #define END "<?END?>"
 #define MAX_READ_SIZE 1024
 #define Timeout 1000
+
 SocketTask::SocketTask(QTcpSocket *socket,QObject* m_pObj){
     this->socket=socket;
     this->m_pObj=m_pObj;
@@ -74,9 +75,8 @@ void SocketTask::run(){
                 qDebug() << "Received message:" << message;
                 receivedData.remove(0, endIndex + strlen(END));
                 foundBegin = false; // Reset for the next message
-                if (receivedData.length()==0) {
+                if (receivedData.length()==0)
                     break;
-                }
             }
         }
     }

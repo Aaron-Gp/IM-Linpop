@@ -17,4 +17,5 @@ private:
     QTcpSocket *socket;
     QObject * m_pObj = nullptr;
 };
+
 #endif // SOCKETTASK_H
