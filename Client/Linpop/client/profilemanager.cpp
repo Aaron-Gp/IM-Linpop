@@ -1,6 +1,8 @@
 #include "profilemanager.h"
 #include <QMutex>
 
+ProfileManager* ProfileManager::self = NULL;
+
 ProfileManager *ProfileManager::getInstance()
 {
     if (self == NULL) {

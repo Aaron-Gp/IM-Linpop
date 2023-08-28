@@ -54,20 +54,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 列表面板切换
     for(int i=0;i<m_sideBar->toolVector.size();i++){
-        connect(m_sideBar->toolVector[i],&QToolButton::clicked,[=](){
-//            qDebug()<<"change to "<<i;
+        connect(m_sideBar->toolVector[i],&QToolButton::clicked,[=](){i;
             m_listBar->stackLLayout->setCurrentIndex(i);
         });
     }
 
     // 聊天面板切换
     connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
-        qDebug()<<"聊天面板切换"<<row;
         QString name = m_listBar->fakeListData->at(row).toObject()["name"].toString();
         QString ip = m_listBar->fakeListData->at(row).toObject()["ip"].toString();
         m_mainBar->changeBar(name, ip);
     });
-
 
     // SET LAYOUT TO CENTRALWIDGET
     QWidget *mainWidget = new QWidget();
