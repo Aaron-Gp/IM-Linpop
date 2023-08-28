@@ -196,6 +196,7 @@ void MainBar::changeBar(QString name, QString ip)
         m_title=name+ip;
         QLabel *title = m_topBar->findChild<QLabel*>();
         title->setText(m_title);
+        clearBroswer();
     }
 }
 
@@ -207,6 +208,7 @@ void MainBar::addMessage(QJsonObject msg)
     QString ip = msg["ip"].toString();
     QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
+
     dealMessage(messageW, item, message, time, QNChatMessage::User_She);
 
     m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);

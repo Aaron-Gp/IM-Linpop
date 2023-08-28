@@ -9,23 +9,23 @@ class ProfileManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ProfileManager(QObject *parent = nullptr);
-
-
-
+    static ProfileManager* getInstance();
     QString m_ip;
     QString m_name;
     QString m_id;
-    QString m_avatar;
+    QString m_avatar=":/icons/avatar";
 
     struct message{
         QString msg;
         QString time;
         QString id;
     };
-
     QVector<QMap<QString, QString>> m_contact;
     QMap<QString,QVector<message>> m_chatList;
+
+private:
+    ProfileManager(QObject *parent = nullptr);
+    static ProfileManager *self;
 
 signals:
 
