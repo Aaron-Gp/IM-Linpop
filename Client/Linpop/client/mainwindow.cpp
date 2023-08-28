@@ -324,6 +324,10 @@ QFrame *MainWindow::rightUi()
     QHBoxLayout *historyLayout = new QHBoxLayout;
     historyLayout->setAlignment(Qt::AlignLeft);
     QListWidget *historyList = new QListWidget;
+//    QSizePolicy hisSizePolicy = splitter->sizePolicy();
+//    hisSizePolicy.setVerticalPolicy(QSizePolicy::Expanding);
+//    historyList->setSizePolicy(splSizePolicy);
+//    historyList->setFixedWidth(790);
     chatBroswer = historyList;
 
     historyLayout->addWidget(chatBroswer);
@@ -473,7 +477,7 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
 {
-    messageW->setFixedWidth(this->width());
+    messageW->setFixedWidth(chatBroswer->width()-20);
     QSize size = messageW->fontRect(text);
     item->setSizeHint(size);
     messageW->setText(text, time, size, type);
@@ -498,7 +502,7 @@ void MainWindow::dealMessageTime(QString curMsgTime)
         QNChatMessage* messageTime = new QNChatMessage(chatBroswer->parentWidget());
         QListWidgetItem* itemTime = new QListWidgetItem(chatBroswer);
 
-        QSize size = QSize(this->width(), 40);
+        QSize size = QSize(chatBroswer->width()-20,40);
         messageTime->resize(size);
         itemTime->setSizeHint(size);
         messageTime->setText(curMsgTime, curMsgTime, size, QNChatMessage::User_Time);
