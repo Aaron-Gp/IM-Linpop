@@ -494,7 +494,6 @@ void MainWindow::dealMessageTime(QString curMsgTime)
         int curTime = curMsgTime.toInt();
         qDebug() << "curTime lastTime:" << curTime - lastTime;
         isShowTime = ((curTime - lastTime) > 60); // 两个消息相差一分钟
-//        isShowTime = true;
     } else {
         isShowTime = true;
     }

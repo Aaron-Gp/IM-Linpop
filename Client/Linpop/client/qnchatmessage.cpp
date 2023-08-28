@@ -99,12 +99,15 @@ QSize QNChatMessage::fontRect(QString str)
 
 QSize QNChatMessage::getRealString(QString src)
 {
+    qDebug()<<src;
     QFontMetricsF fm(this->font());
     m_lineHeight = fm.lineSpacing();
     int nCount = src.count("\n");
+    qDebug()<<nCount;
     int nMaxWidth = 0;
-    if(nCount == 0) {
+    if(nCount == 0) { //没有换行
         nMaxWidth = fm.width(src);
+        qDebug()<<"nMaxWidth"<<nMaxWidth<<"mTextwidth"<<m_textWidth;
         QString value = src;
         if(nMaxWidth > m_textWidth) {
             nMaxWidth = m_textWidth;
@@ -186,7 +189,6 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         penText.setColor(QColor(51,51,51));
         painter.setPen(penText);
         QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
-        option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         painter.setFont(this->font());
         painter.drawText(m_textLeftRect, m_msg,option);
     }  else if(m_userType == User_Type::User_Me) { // 自己
@@ -215,7 +217,6 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         penText.setColor(Qt::white);
         painter.setPen(penText);
         QTextOption option(Qt::AlignLeft | Qt::AlignVCenter);
-        option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         painter.setFont(this->font());
         painter.drawText(m_textRightRect,m_msg,option);
     }  else if(m_userType == User_Type::User_Time) { // 时间
