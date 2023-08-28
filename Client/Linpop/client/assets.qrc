@@ -9,5 +9,6 @@
         <file alias="picture">assets/image.svg</file>
         <file alias="file">assets/file.svg</file>
         <file alias="emoji">assets/emoji.svg</file>
+        <file alias="p2p">assets/p2p.svg</file>
     </qresource>
 </RCC>

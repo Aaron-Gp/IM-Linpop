@@ -22,9 +22,8 @@ MainBar::MainBar(QWidget *parent) : QFrame(parent)
     m_layout->setAlignment(Qt::AlignTop);
     m_layout->setContentsMargins(0,0,0,0);
     m_layout->setSpacing(0);
+    m_profile = ProfileManager::getInstance();
     setLayout(m_layout);
-
-//    setupUi();
 }
 
 void MainBar::setupUi()
@@ -36,8 +35,12 @@ void MainBar::setupUi()
 void MainBar::setupTopBar()
 {
     m_topBar = new QFrame;
+    m_topBar->setFrameStyle(QFrame::Box);
     m_topBar->setLineWidth(0);
-    m_topBar->setFixedHeight(72);
+    m_topBar->setFixedHeight(54);
+    m_topBar->setStyleSheet(".QFrame{"
+                            "border: 1px solid rgb(212,212,212);"
+                            "}");
     QHBoxLayout *titleLayout = new QHBoxLayout;
     titleLayout->setAlignment(Qt::AlignLeft);
     QLabel *title =new QLabel(m_title);
@@ -50,8 +53,8 @@ void MainBar::setupMainBar()
 {
     m_splitter = new QSplitter(this);
     m_splitter->setStyleSheet("QSplitter{"
-                            "border: 0px;"
-                            "}");
+                              "border: 0px;"
+                              "}");
     QSizePolicy splSizePolicy = m_splitter->sizePolicy();
     splSizePolicy.setVerticalPolicy(QSizePolicy::Expanding);
     m_splitter->setSizePolicy(splSizePolicy);
@@ -85,6 +88,14 @@ void MainBar::setupMainBar()
     toolCFrame->setFrameShape(QFrame::Box);
     toolCFrame->setLineWidth(0);
     toolCFrame->setFixedHeight(48);
+    toolCFrame->setStyleSheet("QFrame QToolButton{"
+                              "border: 0;"
+                              "}"
+                              "QFrame QToolButton:hover{"
+                              "background:rgb(205,205,205);"
+                              "border-radius: 10px;"
+                              "border: 1px solid rgb(234,234,234);"
+                              "}");
     QHBoxLayout *toolCLayout = new QHBoxLayout;
     toolCLayout->setContentsMargins(10,0,10,0);
     toolCLayout->setSpacing(10);
@@ -133,45 +144,26 @@ void MainBar::setupMainBar()
     sendCLayout->setAlignment(Qt::AlignRight);
     QPushButton *sendBtn = new QPushButton("发送");
     connect(sendBtn, &QPushButton::clicked, [&](){
-        QString msg = m_chatEditor->toPlainText();
+        QString editorMsg = m_chatEditor->toPlainText();
         m_chatEditor->setText("");
         QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+        qDebug()<<"addMessage" << editorMsg << time << m_chatBroswer->count();
 
-        bool isSending = true; // 发送中
-
-        qDebug()<<"addMessage" << msg << time << m_chatBroswer->count();
         if(m_chatBroswer->count()%2) {
-            if(isSending) {
-                dealMessageTime(time);
-
-                QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
-                QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
-                dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
-            } else {
-                bool isOver = true;
-                for(int i = m_chatBroswer->count() - 1; i > 0; i--) {
-                    QNChatMessage* messageW = (QNChatMessage*)m_chatBroswer->itemWidget(m_chatBroswer->item(i));
-                    if(messageW->text() == msg) {
-                        isOver = false;
-                        messageW->setTextSuccess();
-                    }
-                }
-                if(isOver) {
-                    dealMessageTime(time);
-
-                    QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
-                    QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
-                    dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
-                    messageW->setTextSuccess();
-                }
+            if(editorMsg != "") {
+                QMap<QString,QString> msg;
+                msg.insert("ip", "127.0.0.1");
+                msg.insert("msg", editorMsg);
+                msg.insert("time", time);
+                addMessage(msg);
             }
         } else {
-            if(msg != "") {
-                dealMessageTime(time);
-
-                QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
-                QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
-                dealMessage(messageW, item, msg, time, QNChatMessage::User_She);
+            if(editorMsg != "") {
+                QMap<QString,QString> msg;
+                msg.insert("ip", "127.0.0.2");
+                msg.insert("msg", editorMsg);
+                msg.insert("time", time);
+                addMessage(msg);
             }
         }
         m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
@@ -200,21 +192,26 @@ void MainBar::changeBar(QString name, QString ip)
     }
 }
 
-void MainBar::addMessage(QJsonObject msg)
+void MainBar::addMessage(QMap<QString,QString> msg)
 {
-    QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+    QString time = msg["time"];
     dealMessageTime(time);
-    QString message = msg["msg"].toString();
-    QString ip = msg["ip"].toString();
+    QString message = msg["msg"];
+    QString ip = msg["ip"];
+    qDebug()<<time<<" "<<message<<" "<<ip;
     QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
-    dealMessage(messageW, item, message, time, QNChatMessage::User_She);
+    if(ip==m_profile->m_ip){
+        dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
+    }else{
+        dealMessage(messageW, item, message, time, QNChatMessage::User_Other);
+    }
 
     m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
 }
 
-void MainBar::addMessages(QJsonArray msgs)
+void MainBar::addMessages(QVector<QMap<QString, QString>> msgs)
 {
 
 }
@@ -224,8 +221,6 @@ void MainBar::clearBroswer()
     m_chatBroswer->clear();
     m_chatEditor->clear();
 }
-
-
 
 void MainBar::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
 {

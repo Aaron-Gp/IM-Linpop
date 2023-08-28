@@ -12,6 +12,10 @@
 class QVBoxLayout;
 class QStackedLayout;
 class QListWidget;
+class QLineEdit;
+class QPushButton;
+class QToolButton;
+class QLabel;
 
 class ListBar : public QFrame
 {
@@ -30,6 +34,12 @@ public:
     QStackedLayout *stackLLayout;
     QListWidget *messageWidget;
     QJsonArray *fakeListData;
+    QLineEdit *m_serverPortEditor;
+    QPushButton *portSubmitBtn;
+    QLabel *m_localIpLabel;
+    QLineEdit *searchBar;
+    QToolButton *addContactBtn;
+
 private:
     QFrame *m_topBar;
     QVBoxLayout *m_layout;

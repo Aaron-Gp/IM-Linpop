@@ -6,6 +6,9 @@
 #include <qnchatmessage.h>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QMap>
+#include <QVector>
+#include <profilemanager.h>
 
 class QVBoxLayout;
 class QTextEdit;
@@ -21,8 +24,8 @@ public:
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
     void changeBar(QString name, QString ip);
-    void addMessage(QJsonObject msg);
-    void addMessages(QJsonArray msgs);
+    void addMessage(QMap<QString,QString> msg);
+    void addMessages(QVector<QMap<QString,QString>> msgs);
     void clearBroswer();
 
 
@@ -41,6 +44,7 @@ private:
     QListWidget *m_chatBroswer;
     QString m_title="";
     QSplitter *m_splitter;
+    ProfileManager *m_profile;
 };
 
 #endif // MAINBAR_H

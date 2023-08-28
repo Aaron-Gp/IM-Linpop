@@ -10,6 +10,9 @@
 #include <sidebar.h>
 #include <listbar.h>
 #include <mainbar.h>
+#include <profilemanager.h>
+#include <tcpserver.h>
+#include <tcpclient.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -45,8 +48,11 @@ private:
     QtMaterialAvatar *m_avatar;
     QtMaterialBadge *m_badge;
     QJsonArray *fakeListData;
-    QTextEdit *chatEditor;
-    QListWidget *chatBroswer;
+    QTextEdit *m_chatEditor;
+    QListWidget *m_chatBroswer;
+    ProfileManager *m_profile;
+    TcpServer *m_server;
+    TcpClient *m_client;
 
 };
 #endif // MAINWINDOW_H

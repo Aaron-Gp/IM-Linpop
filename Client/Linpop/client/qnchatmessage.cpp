@@ -152,7 +152,7 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::NoPen);
     painter.setBrush(QBrush(Qt::gray));
 
-    if(m_userType == User_Type::User_She) { // 用户
+    if(m_userType == User_Type::User_Other) { // 用户
         //头像
 //        painter.drawRoundedRect(m_iconLeftRect,m_iconLeftRect.width(),m_iconLeftRect.height());
         painter.drawPixmap(m_iconLeftRect, m_leftPixmap);

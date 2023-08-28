@@ -1,4 +1,4 @@
-QT += core gui widgets
+QT += core gui widgets network sql
 TEMPLATE = app
 CONFIG += c++11
 SOURCES = main.cpp \
@@ -7,13 +7,17 @@ SOURCES = main.cpp \
     mainwindow.cpp \
     profilemanager.cpp \
     qnchatmessage.cpp \
-    sidebar.cpp
+    sidebar.cpp \
+    tcpclient.cpp \
+    tcpserver.cpp
 HEADERS = mainwindow.h \
     listbar.h \
     mainbar.h \
     profilemanager.h \
     qnchatmessage.h \
-    sidebar.h
+    sidebar.h \
+    tcpclient.h \
+    tcpserver.h
 
 LIBS += $$top_builddir/components/$(OBJECTS_DIR)/libcomponents.a
 INCLUDEPATH += $$top_srcdir/components/

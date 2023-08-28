@@ -42,11 +42,11 @@ void ListBar::setupTopBar()
     actionLLayout->setSpacing(5);
     actionLLayout->setAlignment(Qt::AlignLeft);
 
-    QLineEdit *searchBar = new QLineEdit();
-    searchBar->setPlaceholderText("搜索");
+    searchBar = new QLineEdit();
+    searchBar->setPlaceholderText("添加好友ip");
     searchBar->setFixedHeight(32);
     actionLLayout->addWidget(searchBar);
-    QToolButton *addContactBtn = new QToolButton;
+    addContactBtn = new QToolButton;
     addContactBtn->setIcon(QIcon(":/icons/add-person"));
     addContactBtn->setFixedSize(QSize(32,32));
     addContactBtn->setIconSize(QSize(16,16));
@@ -59,11 +59,11 @@ void ListBar::setupTopBar()
 void ListBar::setupStackBar()
 {
     QFrame *stackLFrame = new QFrame;
-    stackLFrame->setStyleSheet("QFrame{"
-                               "border:0;"
+    stackLFrame->setStyleSheet(".QFrame{"
+                               "border: 0;"
                                "background:white;"
                                "}");
-    stackLFrame->setFixedWidth(width()-2);
+    stackLFrame->setFixedWidth(width());
     stackLFrame->setFrameStyle(QFrame::Box);
     stackLFrame->setLineWidth(0);
     stackLLayout = new QStackedLayout;
@@ -72,7 +72,7 @@ void ListBar::setupStackBar()
 
     // MESSAGE LIST
     messageWidget = new QListWidget;
-    messageWidget->setFixedWidth(width()-2);
+    messageWidget->setFixedWidth(width());
     for (int i=0; i<fakeListData->size();i++) {
         QFrame *messageItemFrame = new QFrame;
         messageItemFrame->setFrameShape(QFrame::Box);
@@ -97,7 +97,7 @@ void ListBar::setupStackBar()
 
         QListWidgetItem *messageItem = new QListWidgetItem;
 
-        messageItem->setSizeHint(QSize(messageWidget->width()-2,90));
+        messageItem->setSizeHint(QSize(messageWidget->width(),90));
         messageWidget->addItem(messageItem);
         messageWidget->setItemWidget(messageItem, messageItemFrame);
     }
@@ -125,6 +125,8 @@ void ListBar::setupStackBar()
 
     // CONTACT FRAME
     QFrame *contactFrame = new QFrame;
+    contactFrame->setFrameShape(QFrame::Box);
+    contactFrame->setLineWidth(0);
     contactFrame->setFixedWidth(308);
     QVBoxLayout *contactLayout = new QVBoxLayout;
     contactLayout->setContentsMargins(10,0,10,0);
@@ -134,7 +136,22 @@ void ListBar::setupStackBar()
     QFrame *tabCFrame = new QFrame;
     tabCFrame->setFixedHeight(72);
     QHBoxLayout *tabCLayout = new QHBoxLayout;
-    tabCLayout->setContentsMargins(0,0,0,0);
+    tabCLayout->setContentsMargins(10,0,10,0);
+    tabCLayout->setSpacing(20);
+    tabCFrame->setStyleSheet(".QFrame{"
+                             "background:white;"
+                             "margin: 0px 0px 0px 0px;"
+                             "}"
+                             ".QFrame .QPushButton{"
+                             "background: rgb(234,234,234);"
+                             "border: 0;"
+                             "height: 48px;"
+                             "}"
+                             ".QFrame .QPushButton:hover{"
+                             "background:rgb(234,234,234);"
+                             "color:rgb(0,147,255);"
+                             "border: 1px solid rgb(234,234,234);"
+                             "}");
     QPushButton *personBtn = new QPushButton("好友");
     tabCLayout->addWidget(personBtn);
     QPushButton *groupBtn = new QPushButton("群聊");
@@ -182,12 +199,31 @@ void ListBar::setupStackBar()
     }
 
     stackCLayout->addWidget(personList);
-
     stackCFrame->setLayout(stackCLayout);
     contactLayout->addWidget(stackCFrame);
-
     contactFrame->setLayout(contactLayout);
     stackLLayout->addWidget(contactFrame);
+    // END CONTACT LIST
+
+    // p2p面板
+    QFrame *p2pFrame = new QFrame;
+    p2pFrame->setFrameShape(QFrame::Box);
+    p2pFrame->setLineWidth(0);
+    p2pFrame->setFixedWidth(308);
+    QVBoxLayout *p2pLayout = new QVBoxLayout;
+    p2pLayout->setContentsMargins(10,0,10,0);
+    p2pLayout->setAlignment(Qt::AlignTop);
+    m_localIpLabel = new QLabel("");
+    p2pLayout->addWidget(m_localIpLabel);
+    m_serverPortEditor = new QLineEdit;
+    m_serverPortEditor->setPlaceholderText("请输入服务监听端口");
+    p2pLayout->addWidget(m_serverPortEditor);
+    portSubmitBtn = new QPushButton("连接");
+    p2pLayout->addWidget(portSubmitBtn);
+
+    p2pFrame->setLayout(p2pLayout);
+    stackLLayout->addWidget(p2pFrame);
+
     stackLFrame->setLayout(stackLLayout);
     m_layout->addWidget(stackLFrame);
 }

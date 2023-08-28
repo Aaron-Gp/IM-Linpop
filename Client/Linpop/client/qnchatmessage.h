@@ -17,7 +17,7 @@ public:
     enum User_Type{
         User_System,//系统
         User_Me,    //自己
-        User_She,   //用户
+        User_Other,   //用户
         User_Time,  //时间
     };
     void setTextSuccess();

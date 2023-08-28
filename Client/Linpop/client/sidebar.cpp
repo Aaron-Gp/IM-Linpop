@@ -67,12 +67,19 @@ void SideBar::setupToolBar()
     contactBtn->setIconSize(QSize(32,32));
     toolVector.append(contactBtn);
     actionTLayout->addWidget(contactBtn);
+    QToolButton *p2pBtn = new QToolButton();
+    p2pBtn->setIcon(QIcon(":/icons/p2p"));
+    p2pBtn->setFixedSize(QSize(48,48));
+    p2pBtn->setIconSize(QSize(32,32));
+    toolVector.append(p2pBtn);
+    actionTLayout->addWidget(p2pBtn);
     actionTLayout->addStretch();
     QToolButton *settingBtn = new QToolButton();
     settingBtn->setIcon(QIcon(":/icons/setting"));
     settingBtn->setFixedSize(QSize(48,48));
     settingBtn->setIconSize(QSize(32,32));
     actionTLayout->addWidget(settingBtn);
+
 
     m_layout->addLayout(actionTLayout);
 }
