@@ -14,7 +14,6 @@
 #include <QDateTime>
 #include <QThread>
 #include "client.h"
-#include "tcpserver.h"
 
 class TcpServer;
 

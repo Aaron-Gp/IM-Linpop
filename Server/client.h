@@ -9,6 +9,7 @@ public:
     int port;
     QString ip;
     QTcpSocket* sock;  // 用于存储客户端的 socket 连接
+    int id=0;
     Client(int port,QString ip,QTcpSocket* sock);
 };
 

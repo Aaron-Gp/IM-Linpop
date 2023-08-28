@@ -53,10 +53,9 @@ void MsgAnalyzer::anaylze(){
                     sendError(msg.socket,"incomplete data");
                 else{
                     int receiver_id=information["receiver"].toInt();
-                    db.exec(QString("SELECT ip,is_online FROM user WHERE user_id=%1").arg(receiver_id));
+                    db.exec(QString("SELECT is_online FROM user WHERE user_id=%1").arg(receiver_id));
                     db.query.next();
-                    QString ip=db.query.value(0).toString();
-                    bool is_online=db.query.value(1).toBool();
+                    bool is_online=db.query.value(0).toBool();
                     if(!is_online)
                         storeIntoDatabase(information);
                     else{
@@ -74,7 +73,7 @@ void MsgAnalyzer::anaylze(){
                         */
                         int flag=0;
                         for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++){
-                            if (iter->ip==ip){
+                            if (iter->id==information["receiver"].toInt()){
                                 if(iter->sock->state()!=QAbstractSocket::UnconnectedState){
                                     long long timeStamp=QDateTime::currentMSecsSinceEpoch();
                                     information["timeStamp"]=timeStamp;
@@ -100,9 +99,12 @@ void MsgAnalyzer::anaylze(){
                     if(!db.query.next())
                         sendResult(msg.socket,"result","error_password");
                     else{
+                        for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++)
+                            if (msg.socket==iter->sock)
+                                iter->id=information["sender"].toInt();
+                        sendResult(msg.socket,"result","success");
                         db.exec(QString("update user set is_online=true where user_id=%1").arg(information["sender"].toInt()));
                         db.exec(QString("SELECT * FROM record WHERE receiver_id=%1").arg(information["sender"].toInt()));
-                        sendResult(msg.socket,"result","success");
                         while (db.query.next()) {
                             QJsonObject jsonObject;
                             jsonObject["function"] = "information";
