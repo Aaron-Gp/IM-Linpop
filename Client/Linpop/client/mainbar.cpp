@@ -48,30 +48,30 @@ void MainBar::setupTopBar()
 
 void MainBar::setupMainBar()
 {
-    splitter = new QSplitter(this);
-    splitter->setStyleSheet("QSplitter{"
+    m_splitter = new QSplitter(this);
+    m_splitter->setStyleSheet("QSplitter{"
                             "border: 0px;"
                             "}");
-    QSizePolicy splSizePolicy = splitter->sizePolicy();
+    QSizePolicy splSizePolicy = m_splitter->sizePolicy();
     splSizePolicy.setVerticalPolicy(QSizePolicy::Expanding);
-    splitter->setSizePolicy(splSizePolicy);
-    splitter->setOrientation(Qt::Vertical);
-    splitter->setChildrenCollapsible(false);
-    splitter->setHandleWidth(1);
+    m_splitter->setSizePolicy(splSizePolicy);
+    m_splitter->setOrientation(Qt::Vertical);
+    m_splitter->setChildrenCollapsible(false);
+    m_splitter->setHandleWidth(1);
 
-    QFrame *historyFrame = new QFrame(splitter);
+    QFrame *historyFrame = new QFrame(m_splitter);
     historyFrame->setLineWidth(0);
     historyFrame->setFrameShape(QFrame::Box);
     QHBoxLayout *historyLayout = new QHBoxLayout;
     historyLayout->setAlignment(Qt::AlignLeft);
     QListWidget *historyList = new QListWidget;
-    chatBroswer = historyList;
+    m_chatBroswer = historyList;
 
-    historyLayout->addWidget(chatBroswer);
+    historyLayout->addWidget(m_chatBroswer);
     historyFrame->setLayout(historyLayout);
-    splitter->addWidget(historyFrame);
+    m_splitter->addWidget(historyFrame);
 
-    QFrame *chatFrame = new QFrame(splitter);
+    QFrame *chatFrame = new QFrame(m_splitter);
     chatFrame->setLineWidth(0);
     chatFrame->setFrameShape(QFrame::Box);
     chatFrame->setMinimumHeight(200);
@@ -117,7 +117,7 @@ void MainBar::setupMainBar()
     chatCLayout->setContentsMargins(10,0,10,0);
 
     QTextEdit *chateditor = new QTextEdit;
-    chatEditor = chateditor;
+    m_chatEditor = chateditor;
     chatCLayout->addWidget(chateditor);
     chatCFrame->setLayout(chatCLayout);
     chatLayout->addWidget(chatCFrame);
@@ -133,24 +133,24 @@ void MainBar::setupMainBar()
     sendCLayout->setAlignment(Qt::AlignRight);
     QPushButton *sendBtn = new QPushButton("发送");
     connect(sendBtn, &QPushButton::clicked, [&](){
-        QString msg = chatEditor->toPlainText();
-        chatEditor->setText("");
+        QString msg = m_chatEditor->toPlainText();
+        m_chatEditor->setText("");
         QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
 
         bool isSending = true; // 发送中
 
-        qDebug()<<"addMessage" << msg << time << chatBroswer->count();
-        if(chatBroswer->count()%2) {
+        qDebug()<<"addMessage" << msg << time << m_chatBroswer->count();
+        if(m_chatBroswer->count()%2) {
             if(isSending) {
                 dealMessageTime(time);
 
-                QNChatMessage* messageW = new QNChatMessage(chatBroswer->parentWidget());
-                QListWidgetItem* item = new QListWidgetItem(chatBroswer);
+                QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
+                QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
                 dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
             } else {
                 bool isOver = true;
-                for(int i = chatBroswer->count() - 1; i > 0; i--) {
-                    QNChatMessage* messageW = (QNChatMessage*)chatBroswer->itemWidget(chatBroswer->item(i));
+                for(int i = m_chatBroswer->count() - 1; i > 0; i--) {
+                    QNChatMessage* messageW = (QNChatMessage*)m_chatBroswer->itemWidget(m_chatBroswer->item(i));
                     if(messageW->text() == msg) {
                         isOver = false;
                         messageW->setTextSuccess();
@@ -159,8 +159,8 @@ void MainBar::setupMainBar()
                 if(isOver) {
                     dealMessageTime(time);
 
-                    QNChatMessage* messageW = new QNChatMessage(chatBroswer->parentWidget());
-                    QListWidgetItem* item = new QListWidgetItem(chatBroswer);
+                    QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
+                    QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
                     dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
                     messageW->setTextSuccess();
                 }
@@ -169,12 +169,12 @@ void MainBar::setupMainBar()
             if(msg != "") {
                 dealMessageTime(time);
 
-                QNChatMessage* messageW = new QNChatMessage(chatBroswer->parentWidget());
-                QListWidgetItem* item = new QListWidgetItem(chatBroswer);
+                QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
+                QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
                 dealMessage(messageW, item, msg, time, QNChatMessage::User_She);
             }
         }
-        chatBroswer->setCurrentRow(chatBroswer->count()-1);
+        m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
     });
     sendCLayout->addWidget(sendBtn);
     sendCFrame->setLayout(sendCLayout);
@@ -182,8 +182,8 @@ void MainBar::setupMainBar()
 
     chatFrame->setLayout(chatLayout);
 
-    splitter->addWidget(chatFrame);
-    m_layout->addWidget(splitter);
+    m_splitter->addWidget(chatFrame);
+    m_layout->addWidget(m_splitter);
 }
 
 void MainBar::changeBar(QString name, QString ip)
@@ -199,21 +199,47 @@ void MainBar::changeBar(QString name, QString ip)
     }
 }
 
+void MainBar::addMessage(QJsonObject msg)
+{
+    QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+    dealMessageTime(time);
+    QString message = msg["msg"].toString();
+    QString ip = msg["ip"].toString();
+    QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
+    QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
+    dealMessage(messageW, item, message, time, QNChatMessage::User_She);
+
+    m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
+}
+
+void MainBar::addMessages(QJsonArray msgs)
+{
+
+}
+
+void MainBar::clearBroswer()
+{
+    m_chatBroswer->clear();
+    m_chatEditor->clear();
+}
+
+
+
 void MainBar::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
 {
-    messageW->setFixedWidth(chatBroswer->width()-20);
+    messageW->setFixedWidth(m_chatBroswer->width()-20);
     QSize size = messageW->fontRect(text);
     item->setSizeHint(size);
     messageW->setText(text, time, size, type);
-    chatBroswer->setItemWidget(item, messageW);
+    m_chatBroswer->setItemWidget(item, messageW);
 }
 
 void MainBar::dealMessageTime(QString curMsgTime)
 {
     bool isShowTime = false;
-    if(chatBroswer->count() > 0) {
-        QListWidgetItem* lastItem = chatBroswer->item(chatBroswer->count() - 1);
-        QNChatMessage* messageW = (QNChatMessage*)chatBroswer->itemWidget(lastItem);
+    if(m_chatBroswer->count() > 0) {
+        QListWidgetItem* lastItem = m_chatBroswer->item(m_chatBroswer->count() - 1);
+        QNChatMessage* messageW = (QNChatMessage*)m_chatBroswer->itemWidget(lastItem);
         int lastTime = messageW->time().toInt();
         int curTime = curMsgTime.toInt();
         qDebug() << "curTime lastTime:" << curTime - lastTime;
@@ -222,14 +248,14 @@ void MainBar::dealMessageTime(QString curMsgTime)
         isShowTime = true;
     }
     if(isShowTime) {
-        QNChatMessage* messageTime = new QNChatMessage(chatBroswer->parentWidget());
-        QListWidgetItem* itemTime = new QListWidgetItem(chatBroswer);
+        QNChatMessage* messageTime = new QNChatMessage(m_chatBroswer->parentWidget());
+        QListWidgetItem* itemTime = new QListWidgetItem(m_chatBroswer);
 
-        QSize size = QSize(chatBroswer->width()-20,40);
+        QSize size = QSize(m_chatBroswer->width()-20,40);
         messageTime->resize(size);
         itemTime->setSizeHint(size);
         messageTime->setText(curMsgTime, curMsgTime, size, QNChatMessage::User_Time);
-        chatBroswer->setItemWidget(itemTime, messageTime);
+        m_chatBroswer->setItemWidget(itemTime, messageTime);
     }
 }
 

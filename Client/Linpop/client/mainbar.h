@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QFrame>
 #include <qnchatmessage.h>
+#include <QJsonArray>
+#include <QJsonObject>
 
 class QVBoxLayout;
 class QTextEdit;
@@ -35,10 +37,10 @@ private:
     QFrame *m_topBar;
     QVBoxLayout *m_layout;
     QString m_avatarPath = ":/icons/avatar";
-    QTextEdit *chatEditor;
-    QListWidget *chatBroswer;
+    QTextEdit *m_chatEditor;
+    QListWidget *m_chatBroswer;
     QString m_title="";
-    QSplitter *splitter;
+    QSplitter *m_splitter;
 };
 
 #endif // MAINBAR_H

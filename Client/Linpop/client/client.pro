@@ -5,11 +5,13 @@ SOURCES = main.cpp \
     listbar.cpp \
     mainbar.cpp \
     mainwindow.cpp \
+    profilemanager.cpp \
     qnchatmessage.cpp \
     sidebar.cpp
 HEADERS = mainwindow.h \
     listbar.h \
     mainbar.h \
+    profilemanager.h \
     qnchatmessage.h \
     sidebar.h
 
