@@ -10,10 +10,9 @@ MsgAnalyzer::~MsgAnalyzer(){
 }
 
 void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-    long long timeStamp=QDateTime::currentMSecsSinceEpoch();
-    db.exec(QString("insert into record(sender_id,receiver_id,timestamp,type,data) values(%1,%2,%3,'%4','%5')").arg
-                (information["sender"].toInt()).arg(information["receiver"].toInt()).arg(timeStamp).arg
-                (information["type"].toString()).arg(information["data"].toString()));
+    int timeStamp=QDateTime::currentMSecsSinceEpoch();
+    information["timeStamp"]=timeStamp;
+    db.addMessage(information);
 }
 
 void MsgAnalyzer::sendError(QTcpSocket* socket,QString error){
@@ -53,29 +52,14 @@ void MsgAnalyzer::anaylze(){
                     sendError(msg.socket,"incomplete data");
                 else{
                     int receiver_id=information["receiver"].toInt();
-                    db.exec(QString("SELECT is_online FROM user WHERE user_id=%1").arg(receiver_id));
-                    db.query.next();
-                    bool is_online=db.query.value(0).toBool();
-                    if(!is_online)
+                    if(!db.isUserOnline(receiver_id))
                         storeIntoDatabase(information);
                     else{
-                        /*
-                        if(!tryConnect(ip)){
-                            db.exec(QString("UPDATE user SET is_online=false WHERE user_id=%1").arg(receiver_id));
-                            storeIntoDatabase(information);
-                        }else{
-                            long long timeStamp=QDateTime::currentMSecsSinceEpoch();
-                            information["timeStamp"]=timeStamp;
-                            QJsonDocument jsonDoc(information);
-                            QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
-                            client->write(jsonString.toUtf8());
-                        }
-                        */
                         int flag=0;
-                        for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++){
+                        for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++){//找到对应id的socket
                             if (iter->id==information["receiver"].toInt()){
                                 if(iter->sock->state()!=QAbstractSocket::UnconnectedState){
-                                    long long timeStamp=QDateTime::currentMSecsSinceEpoch();
+                                    int timeStamp=QDateTime::currentMSecsSinceEpoch();
                                     information["timeStamp"]=timeStamp;
                                     sendJson(iter->sock,information);
                                     flag=1;
@@ -84,44 +68,35 @@ void MsgAnalyzer::anaylze(){
                             }
                         }
                         if(!flag){
-                            db.exec(QString("UPDATE user SET is_online=false WHERE user_id=%1").arg(receiver_id));
+                            db.setUserAccountOffline(receiver_id);
                             storeIntoDatabase(information);
                         }
                     }
                 }
             }
-            if(information["function"].toString()=="login_in"){
-                db.exec(QString("SELECT user_id FROM user WHERE user_id=%1").arg(information["sender"].toInt()));
-                if(!db.query.next())
-                    sendResult(msg.socket,"result","account_not_found");
-                else{
-                    db.exec(QString("SELECT user_id FROM user WHERE user_id=%1 and password='%2'").arg(information["sender"].toInt()).arg(information["password"].toString()));
-                    if(!db.query.next())
-                        sendResult(msg.socket,"result","error_password");
-                    else{
-                        for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++)
-                            if (msg.socket==iter->sock)
-                                iter->id=information["sender"].toInt();
-                        sendResult(msg.socket,"result","success");
-                        db.exec(QString("update user set is_online=true where user_id=%1").arg(information["sender"].toInt()));
-                        db.exec(QString("SELECT * FROM record WHERE receiver_id=%1").arg(information["sender"].toInt()));
-                        while (db.query.next()) {
-                            QJsonObject jsonObject;
-                            jsonObject["function"] = "information";
-                            jsonObject["sender"] = db.query.value("sender_id").toInt();
-                            jsonObject["receiver"] = db.query.value("receiver_id").toInt();
-                            jsonObject["timestamp"] = db.query.value("timestamp").toString();
-                            jsonObject["type"] = db.query.value("type").toString();
-                            jsonObject["data"] = db.query.value("data").toString();
-                            sendJson(msg.socket,jsonObject);
-                        }
-                        db.exec(QString("delete FROM record WHERE receiver_id=%1").arg(information["sender"].toInt()));
-                    }
+            if(information["function"].toString()=="login"){
+                switch(db.isUserAccountCorrect(information["sender"].toInt(),information["password"].toString())){
+                case 1:
+                    sendResult(msg.socket,"result","account not found");
+                    break;
+                case 2:
+                    sendResult(msg.socket,"result","incorrect password");
+                    break;
+                case 3:
+                    for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++)
+                        if (msg.socket==iter->sock)
+                            iter->id=information["sender"].toInt();
+                    sendResult(msg.socket,"result","success");//在isUserAccountCorrect中已更改登录状态
+                    QList<QJsonObject> jsonList;
+                    db.getMessage(information["sender"].toInt(),jsonList);
+                    for (QList<QJsonObject>::iterator iter = jsonList.begin(); iter != jsonList.end(); iter++)
+                        sendJson(msg.socket,*iter);
+                    db.deleteMessage(information["sender"].toInt());
                 }
             }
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
-            sendError(msg.socket,"invalid_input");
+            sendError(msg.socket,e.what());
         }
     }else
         sendError(msg.socket,"improper_json");

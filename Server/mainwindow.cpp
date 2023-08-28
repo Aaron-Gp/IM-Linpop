@@ -22,16 +22,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 连接 QSignalMapper 的 mapped 信号到槽函数
     connect(signalMapper, static_cast<void (QSignalMapper::*)(int)>(&QSignalMapper::mapped), this, &MainWindow::slotSwitchToPage);
-
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::slotDeleteFromDataBase);
     //db->ShowInTable(ui->tableView,"SELECT * FROM USER");
-
-    db->ShowInTable(ui->tableView, "SELECT user.user_id AS 工号, user.name AS 姓名, department.name AS 部门 FROM user, department WHERE user.department = department.id");
+    db->ShowInTable(ui->tableView, "SELECT user.id AS 工号, user.name AS 姓名, department.name AS 部门 FROM user, department WHERE user.department = department.id");
     db->ShowInComboBox(ui->comboBox,"SELECT NAME FROM DEPARTMENT");
     connect(ui->pushButton_2,&QPushButton::clicked, this, &MainWindow::slotSearch);
-
     server = new TcpServer(this);
-
 }
 
 MainWindow::~MainWindow(){
@@ -44,20 +40,20 @@ void MainWindow::slotSwitchToPage(int i){
 
 void MainWindow::slotDeleteFromDataBase(){
     try{
-        deleteFromDataBase(db,"User");
+        deleteFromDataBase();
     }catch(const std::exception &e){
         throw e;
     }
 }
 
 void MainWindow::slotSearch(){
-    QString id=ui->lineEdit->text();
-    QString name=ui->lineEdit_2->text();
-    QString department=ui->comboBox->currentText();
-    db->ShowInTable(ui->tableView, QString("SELECT * FROM (SELECT CAST(user.user_id AS NVARCHAR) AS 工号, user.name AS 姓名, department.name AS 部门 FROM user, department WHERE user.department = department.id) where 工号 like '%%1%' and 姓名 like '%%2%' and 部门 like '%%3%'").arg(id).arg(name).arg(department));
+    QString id=ui->lineEdit_2->text();
+    QString name=ui->lineEdit->text();
+    QString department=ui->comboBox->currentText();;
+    db->ShowInTable(ui->tableView, id, name , department);
 }
 
-void MainWindow::deleteFromDataBase(DataBase* db, QString tableName){
+void MainWindow::deleteFromDataBase(){
     QModelIndexList selectedIndexes = ui->tableView->selectionModel()->selectedIndexes();
     if (!selectedIndexes.isEmpty()) {
         QMessageBox::StandardButton reply;
@@ -68,14 +64,10 @@ void MainWindow::deleteFromDataBase(DataBase* db, QString tableName){
             // 获取行中的主键或标识，根据需要进行数据库删除操作
             QAbstractItemModel *model = ui->tableView->model();// 假设第一列是主键
             QVariant data = model->data(model->index(selectedRow, 0));
-            QString value=data.toString();
-            //QString key = ui->tableView->horizontalHeader()->model()->headerData(0, Qt::Horizontal).toString();
-            QString key="user_id";
+            int value=data.toInt();
             try{
-                //qDebug()<<QString("DELETE FROM %1 WHERE %2 = %3").arg(tableName).arg(key).arg(value);
-                db->exec(QString("DELETE FROM %1 WHERE %2 = %3").arg(tableName).arg(key).arg(value));
-                //qDebug() << "Row deleted successfully";
-                db->ShowInTable(ui->tableView, QString("SELECT * FROM %1").arg(tableName));
+                db->deleteUserAccount(value);
+                slotSearch();
             }catch(const std::exception &e){
                 throw e;
             }

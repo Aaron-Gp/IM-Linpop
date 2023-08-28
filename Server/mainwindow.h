@@ -26,7 +26,7 @@ public slots:
     void slotDeleteFromDataBase();
     void slotSearch();
 private:
-    void deleteFromDataBase(DataBase *db, QString tableName);
+    void deleteFromDataBase();
     static void switchToPage(int);
 public:
     Ui::MainWindow *ui;
