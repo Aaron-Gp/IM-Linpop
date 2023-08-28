@@ -7,6 +7,9 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <qnchatmessage.h>
+#include <sidebar.h>
+#include <listbar.h>
+#include <mainbar.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,23 +32,21 @@ public:
     QFrame* leftUi();
     QFrame* middleUi();
     QFrame* rightUi();
-    void  makeFakeData();
-
-    void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
-    void dealMessageTime(QString curMsgTime);
-
-private slots:
-    void on_pushButton_clicked();
+    void makeFakeData();
 
 signals:
     void switched(int index);
 
 private:
     Ui::MainWindow *ui;
-    QtMaterialAvatar      *const m_avatar;
-    QtMaterialBadge       *const m_badge;
+    SideBar *m_sideBar;
+    ListBar *m_listBar;
+    MainBar *m_mainBar;
+    QtMaterialAvatar *m_avatar;
+    QtMaterialBadge *m_badge;
     QJsonArray *fakeListData;
     QTextEdit *chatEditor;
     QListWidget *chatBroswer;
+
 };
 #endif // MAINWINDOW_H
