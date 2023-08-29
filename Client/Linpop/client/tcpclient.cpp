@@ -6,6 +6,26 @@
 TcpClient::TcpClient(QWidget *parent) : QWidget(parent)
 {
     m_profile = ProfileManager::getInstance();
+    db=new ClientDataBase;
+    analyzer = new MsgAnalyzer(db);
+    {//用于和服务器连接
+        m_server = new QTcpSocket();   //实例化tcpClient
+        m_server->connectToHost(SERVER, PORT);
+        bool ok = m_server->waitForConnected(1000);
+        if (!ok)
+            MYLOG<<"fail to connect server";
+        else
+            MYLOG<<"success to connect server";
+        connect(m_server, &QTcpSocket::readyRead, analyzer,[&](){
+            analyzer->readMessage(m_server);
+        });
+        connect(m_server, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), [&](){
+            m_server->disconnectFromHost();
+            QMessageBox msgBox;
+            msgBox.setText(tr("disconnect with server"));
+            msgBox.exec();
+        });
+    }
 }
 
 void TcpClient::newConnection(QString ip)
@@ -29,7 +49,6 @@ void TcpClient::newConnection(QString ip)
             m_profile->m_chatList.insert(ip, Message());
         }
         MYLOG<<"send hello message";
-
         QString data = "hello from client!";
         tcpClient->write(data.toUtf8());
     }else{
@@ -61,9 +80,12 @@ void TcpClient::newConnection(QString ip)
     });
 }
 
-void TcpClient::sendData(QString ip, QString msg)
-{
+void TcpClient::sendData(QString ip, QString msg){
 
+}
+
+void TcpClient::sendToServer(QString msg){
+    m_server->write(msg.toUtf8());
 }
 
 TcpClient::~TcpClient()

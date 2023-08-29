@@ -82,16 +82,16 @@ void MsgAnalyzer::anaylze(){
             if(information["function"].toString()=="login"){
                 switch(db.isUserAccountCorrect(information["sender"].toInt(),information["password"].toString(),msg.socket->peerAddress().toString())){
                 case 1:
-                    sendResult(msg.socket,"result","account not found");
+                    sendResult(msg.socket,"login","account not found");
                     break;
                 case 2:
-                    sendResult(msg.socket,"result","incorrect password");
+                    sendResult(msg.socket,"login","incorrect password");
                     break;
                 case 3:
                     for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++)
                         if (msg.socket==iter->sock)
                             iter->id=information["sender"].toInt();
-                    sendResult(msg.socket,"result","success");//在isUserAccountCorrect中已更改登录状态
+                    sendResult(msg.socket,"login","success");//在isUserAccountCorrect中已更改登录状态
 
                     QList<QJsonObject> jsonList;
                     db.getMessage(information["sender"].toInt(),jsonList);

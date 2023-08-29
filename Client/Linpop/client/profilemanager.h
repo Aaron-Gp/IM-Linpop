@@ -11,12 +11,14 @@ typedef struct{
     QString msg;
     QString time;
     QString ip;
+    QString id;
 }message;
 
 typedef struct{
     QString ip;
     QString avatar=":/icons/person";
     QString name;
+    QString id;
 }profile;
 
 using Message = QVector<message>;

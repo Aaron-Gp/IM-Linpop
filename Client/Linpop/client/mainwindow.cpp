@@ -24,8 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-
-    m_profile = ProfileManager::getInstance();
+    m_profile = ProfileManager::getInstance();//联系人列表
     setStyleSheet("QMainWindow{"
                   "background:rgb(234,234,234);"
                   "margin:0;"
@@ -169,12 +168,31 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(mainWidget);
 
     MYLOG<<"ui initialezed completed!";
+
+    connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::successLogin);
+    connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::login);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     m_server->closeAll();
+}
+
+void MainWindow::tryLogin(QString id, QString password)
+{
+    QJsonObject json;
+    json["function"] = "login";
+    json["sender"]=id.toInt();
+    json["password"]=password;
+    QJsonDocument jsonDoc(json);
+    QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+    m_client->m_server->write(jsonString.toUtf8());
+}
+
+void MainWindow::login()
+{
+    this->show();
 }
 
 
