@@ -15,6 +15,7 @@
 #include <QThread>
 #include "client.h"
 
+
 class TcpServer;
 
 class MsgAnalyzer:public QObject{
