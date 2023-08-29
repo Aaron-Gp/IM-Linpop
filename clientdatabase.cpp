@@ -92,7 +92,29 @@ bool ClientDataBase::getMessage(QString id, QList<QJsonObject> &jsonMessageList)
     return true;
 }
 
-
+bool ClientDataBase::selectHistoryByData(QString id, QString dataPart, QList<QJsonObject> &jsonMessageList){
+    query.prepare("SELECT * FROM history WHERE id = ? AND data LIKE ? ORDER BY timestamp");
+    QVariantList a,b;
+    a << id;
+    b << "%" + dataPart + "%";
+    query.addBindValue(a);
+    query.addBindValue(b);
+    if(!query.execBatch()){
+        qDebug() << "Failed to select the history by data: " << query.lastError();
+        return false;
+    }
+    while(query.next()){
+        QJsonObject jsonMessage;
+        jsonMessage["id"] = query.value("id").toString();
+        jsonMessage["timestamp"] = query.value("timestamp").toString();
+        jsonMessage["type"] = query.value("type").toString();
+        jsonMessage["data"] = query.value("data").toString();
+        jsonMessage["isSender"] = query.value("isSender").toInt();
+        jsonMessageList.append(jsonMessage);
+    }
+    qDebug() << "Succeed to select the history by data!";
+    return true;
+}
 
 
 /*
