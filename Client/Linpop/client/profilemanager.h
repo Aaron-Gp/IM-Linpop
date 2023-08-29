@@ -5,8 +5,9 @@
 #include <QMap>
 #include <QVector>
 #include <QList>
-#include <QTcpSocket>
 #include "global.h"
+
+class ClientToServer;
 
 typedef struct{
     QString msg;
@@ -36,7 +37,7 @@ public:
     QList<QString> m_contact;
     QVector<profile> m_contactProfile;
     QMap<QString,Message> m_chatList;
-    QTcpSocket *m_clientToServer;
+    ClientToServer *m_clientToServer;
 
 private:
     ProfileManager(QObject *parent = nullptr);

@@ -16,13 +16,9 @@ login::login(QWidget *parent) :
     ui(new Ui::login)
 {
     ui->setupUi(this);
-
     // Initialize networkManager
     networkManager = new QNetworkAccessManager(this);
-
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint|this->windowFlags());
-
-
+//    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint|this->windowFlags());
 }
 
 login::~login()
@@ -52,62 +48,14 @@ void login::on_passwordlineEdit_textEdited(const QString &arg1)
 
 void login::on_loginButon_clicked()
 {
-        QString username = ui->accountlineEdit->text();
-        QString password = ui->passwordlineEdit->text();
+    QString id = ui->accountlineEdit->text();
+    QString password = ui->passwordlineEdit->text();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            qDebug() << "Username and password are required.";
-            return;
-        }
-
-        // Save password locally
-//        if (rememberPassword) {
-//            settings->setValue("username", username);
-//            settings->setValue("password", password);
-//        }
-
-        // Construct the login request
-        QUrl loginUrl(""); // Replace with your actual backend URL
-        QNetworkRequest request(loginUrl);
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-        // Prepare POST data
-        QString postData = "username=" + username.toUtf8().toPercentEncoding() +
-                           "&password=" + password.toUtf8().toPercentEncoding();
-
-        // Send the login request
-        QNetworkReply *reply = networkManager->post(request, postData.toUtf8());
-        connect(reply, &QNetworkReply::finished, this, [=]() {
-            handleLoginResponse(reply);
-        });
-}
-
-void login::handleLoginResponse(QNetworkReply *reply) {
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray response = reply->readAll();
-        QJsonDocument jsonResponse = QJsonDocument::fromJson(response);
-
-        if (!jsonResponse.isNull() && jsonResponse.isObject()) {
-            QJsonObject jsonObject = jsonResponse.object();
-            QJsonValue successValue = jsonObject.value("success");
-
-            if (successValue.isBool()) {
-                bool loginSuccess = successValue.toBool();
-
-                if (loginSuccess) {
-                    // Login successful
-                    QMessageBox::information(this, "Login Successful", "Welcome!");
-                    emit loginSucceed();
-                } else {
-                    // Login failed
-                    QMessageBox::warning(this, "Login Failed", "Invalid username or password.");
-                }
-            }
-        }
-    } else {
-        // Network error
-        QMessageBox::critical(this, "Network Error", "An error occurred while connecting to the server.");
+    if (id.isEmpty() || password.isEmpty()) {
+        qDebug() << "Username and password are required.";
+        return;
     }
-    reply->deleteLater(); // Clean up
+
+    emit tryLogin(id,password);
 }
 

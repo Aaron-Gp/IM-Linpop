@@ -3,11 +3,14 @@ TEMPLATE = app
 CONFIG += c++14
 SOURCES = main.cpp \
     cabstractemojitable.cpp \
+    clientdatabase.cpp \
+    clienttoserver.cpp \
     emojitab.cpp \
     listbar.cpp \
     login.cpp \
     mainbar.cpp \
     mainwindow.cpp \
+    msganalyzer.cpp \
     profilemanager.cpp \
     qnchatmessage.cpp \
     sidebar.cpp \
@@ -15,11 +18,14 @@ SOURCES = main.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
     cabstractemojitable.h \
+    clientdatabase.h \
+    clienttoserver.h \
     emojitab.h \
     global.h \
     listbar.h \
     login.h \
     mainbar.h \
+    msganalyzer.h \
     profilemanager.h \
     qnchatmessage.h \
     sidebar.h \
