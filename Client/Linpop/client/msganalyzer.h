@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QElapsedTimer>
 #include "clientdatabase.h"
+#include "profilemanager.h"
 
 class MsgAnalyzer:public QObject{
     Q_OBJECT
@@ -22,6 +23,9 @@ public:
     void storeIntoDatabase(QJsonObject information);
     void sendError(QTcpSocket *socket, QString error);
     void anaylze(QTcpSocket *socket, QString message);
+
+    ProfileManager *m_profile;
+
 signals:
     void successLogin();
 public slots:

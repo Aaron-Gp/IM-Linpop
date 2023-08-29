@@ -24,6 +24,7 @@ class ListBar : public QFrame
 public:
     explicit ListBar(QWidget *parent = nullptr);
     void addContact(profile pf);
+    void updateContactList();
 
 private:
     void setupUi();
@@ -47,6 +48,11 @@ public:
     // 添加联系人
     QLineEdit *searchBar;
     QToolButton *addContactBtn;
+
+    QFrame *contactFrame;
+    QFrame *tabCFrame;
+    QFrame *stackCFrame;
+    QListWidget *personList;
 
 private:
     QFrame *m_topBar;

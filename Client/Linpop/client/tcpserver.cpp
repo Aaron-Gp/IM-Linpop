@@ -35,13 +35,13 @@ void TcpServer::closeAll()
 void TcpServer::NewConnectionSlot()
 {
     currentClient = tcpServer->nextPendingConnection();
-    QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
+    QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
     MYLOG<<"new connection from "<<ip;
 
     connect(currentClient, &QTcpSocket::readyRead, [=](){
         QByteArray buffer = currentClient->readAll();
         if(!buffer.isEmpty()){
-            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
+            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
             MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
             message msg;
             msg.msg = QString::fromUtf8(buffer);
@@ -56,7 +56,7 @@ void TcpServer::NewConnectionSlot()
         if(currentClient->state() == QAbstractSocket::UnconnectedState)
         {
             // 删除存储在tcpClient列表中的客户端信息
-            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
+            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
             currentClient->destroyed();
             MYLOG<<"destroy "<<ip;
             m_tcpClient.remove(ip);

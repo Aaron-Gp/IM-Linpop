@@ -3,7 +3,7 @@
 ClientToServer::ClientToServer(QWidget *parent):QWidget(parent)
 {
     m_profile = ProfileManager::getInstance();
-    m_db=new ClientDataBase;
+    m_db= m_profile->m_db;
     m_analyzer = new MsgAnalyzer(m_db);
     //用于和服务器连接
     m_server = new QTcpSocket();   //实例化tcpClient

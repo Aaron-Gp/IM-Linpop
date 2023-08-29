@@ -63,11 +63,11 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // 聊天面板切换
-//    connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
-//        QString name = m_profile->m_contactProfile.at(row).name;
-//        QString ip = m_profile->m_contactProfile.at(row).ip;
-//        m_mainBar->changeBar(name, ip);
-//    });
+    connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
+        QString name = m_profile->m_contactProfile.at(row).name;
+        QString ip = m_profile->m_contactProfile.at(row).ip;
+        m_mainBar->changeBar(name, ip);
+    });
 
     // client连接
     m_client = new TcpClient;
@@ -82,13 +82,14 @@ MainWindow::MainWindow(QWidget *parent)
             m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
             MYLOG<<"add contact bar to "<<m_listBar->messageWidget->count()-1;
             //面板更新
-            m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
-            MYLOG<<"change bar";
+//            m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
+//            MYLOG<<"change bar";
         }
     });
 
     connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){
         int index = m_listBar->messageWidget->currentRow();
+        m_profile->m_chatList[ip].append(msg);
         MYLOG<<"current row"<<index;
         MYLOG<<"compare"<<m_profile->m_contactProfile[index].ip<<" : " <<ip;
         if(m_profile->m_contactProfile[index].ip==ip){
@@ -130,7 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_server, &TcpServer::appendMsg, [=](QString ip, message msg){
         int index = m_listBar->messageWidget->currentRow();
-
+        m_profile->m_chatList[ip].append(msg);
         MYLOG<<"compare"<<m_profile->m_contactProfile[index].ip<<" : " <<ip;
         if(m_profile->m_contactProfile[index].ip==ip){
             m_mainBar->addMessage(msg);

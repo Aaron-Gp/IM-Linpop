@@ -156,6 +156,7 @@ void MainBar::changeBar(QString name, QString ip)
     QLabel *title = m_topBar->findChild<QLabel*>();
     title->setText(m_title);
     clearBroswer();
+    addMessages(m_profile->m_chatList[ip]);
 }
 
 void MainBar::addMessage(message msg)
@@ -179,7 +180,23 @@ void MainBar::addMessage(message msg)
 
 void MainBar::addMessages(Message msgs)
 {
+    for(auto msg : msgs){
+        QString time = msg.time;
+        dealMessageTime(time);
+        QString message = msg.msg;
+        QString ip = msg.ip;
+        MYLOG<<time<<" "<<message<<" "<<ip;
+        QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
+        QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
+        if(ip==m_profile->m_ip){
+            dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
+        }else{
+            dealMessage(messageW, item, message, time, QNChatMessage::User_Other);
+        }
+
+        m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
+    }
 }
 
 void MainBar::clearBroswer()

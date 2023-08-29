@@ -3,6 +3,7 @@
 
 #define SERVER QString("192.168.163.130")
 #define PORT 6666
+#define DATABASE "./data.db"
 
 #include <QDebug>
 #define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"

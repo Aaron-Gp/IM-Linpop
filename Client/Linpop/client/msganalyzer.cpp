@@ -7,6 +7,7 @@
 
 MsgAnalyzer::MsgAnalyzer(ClientDataBase* db){
     this->db=db;
+    m_profile = ProfileManager::getInstance();
 }
 
 void MsgAnalyzer::readMessage(QTcpSocket* socket){
@@ -69,12 +70,12 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
         QJsonObject information=document.object();
         try{
             if(information["function"].toString()=="login"){
-                if(information["data"].toString()=="success")
+                if(information["data"].toString()=="success"){
                     emit successLogin();
+                }
                 else
                     QMessageBox::information(nullptr, "Information", information["data"].toString());
             }
-
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
             sendError(socket,e.what());

@@ -8,23 +8,14 @@
 
 ClientDataBase::ClientDataBase()
 {
-
+    connectDataBase();
 }
 
 bool ClientDataBase::connectDataBase(){
     // 创建一个QSqlDatabase对象，用于连接数据库
     db = QSqlDatabase::addDatabase("QSQLITE","cdb");
-
     // 指定数据库路径，如果路径不存在，将会创建一个新数据库
-    db.setDatabaseName("../DB/data.db");
-
-    //查找数据库在本地的位置
-    /*QString databasePath = QCoreApplication::applicationDirPath() + "/:memory:.db";
-    QString newDatabasePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/:memory:.db";
-    qDebug() << databasePath;
-    qDebug() << newDatabasePath;
-    //QFile::copy(databasePath, newDatabasePath);
-    */
+    db.setDatabaseName(DATABASE);
 
     // 尝试建立到数据库的连接
     if (!db.open()) {
@@ -34,13 +25,10 @@ bool ClientDataBase::connectDataBase(){
 
     query=QSqlQuery(db);
 
-    /*
     //删除表
     if(!query.exec("DROP TABLE history;")){
         qDebug() << "Failed to drop table history";
     }
-    */
-
 
     // 创建一个表
     if (!query.exec("CREATE TABLE history (id TEXT, timestamp TEXT PRIMARY KEY, type TEXT, data TEXT, isSender INTEGER)")) {

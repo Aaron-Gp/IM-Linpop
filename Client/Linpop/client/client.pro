@@ -6,6 +6,7 @@ SOURCES = main.cpp \
     clientdatabase.cpp \
     clienttoserver.cpp \
     emojitab.cpp \
+    filetransfer.cpp \
     listbar.cpp \
     login.cpp \
     mainbar.cpp \
@@ -21,6 +22,7 @@ HEADERS = mainwindow.h \
     clientdatabase.h \
     clienttoserver.h \
     emojitab.h \
+    filetransfer.h \
     global.h \
     listbar.h \
     login.h \

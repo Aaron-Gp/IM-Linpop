@@ -25,12 +25,12 @@ ListBar::ListBar(QWidget *parent) : QFrame(parent)
 
 void ListBar::addContact(profile pf)
 {
+    // ADD TO MESSAGE LIST
     QFrame *messageItemFrame = new QFrame;
     messageItemFrame->setFrameShape(QFrame::Box);
     messageItemFrame->setLineWidth(0);
     messageItemFrame->setFixedHeight(90);
     QHBoxLayout *messageItemLayout = new QHBoxLayout;
-
     QLabel *avatar = new QLabel;
     avatar->setStyleSheet("QLabel{"
                           "border-radius:30px;"
@@ -52,6 +52,34 @@ void ListBar::addContact(profile pf)
     messageItem->setSizeHint(QSize(messageWidget->width(),90));
     messageWidget->addItem(messageItem);
     messageWidget->setItemWidget(messageItem, messageItemFrame);
+
+
+    // ADD TO CONTACT LIST
+    QFrame *contactItemFrame = new QFrame;
+    contactItemFrame->setFrameShape(QFrame::Box);
+    contactItemFrame->setLineWidth(0);
+    contactItemFrame->setFixedHeight(90);
+    QHBoxLayout *contactItemLayout = new QHBoxLayout;
+
+    avatar = new QLabel;
+    avatar->setStyleSheet("QLabel{"
+                          "border-radius:2px;"
+                          "border-image:url("+pf.avatar+");"
+                          "}");
+    avatar->setFixedSize(60,60); contactItemLayout->addWidget(avatar);
+
+    QVBoxLayout *rightCILayout = new QVBoxLayout;
+    rightCILayout->setContentsMargins(0,0,0,0);
+    msg = new QLabel(pf.name+"("+pf.ip+")");
+    rightCILayout->addWidget(msg);
+
+    contactItemLayout->addLayout(rightCILayout);
+    contactItemFrame->setLayout(contactItemLayout);
+
+    QListWidgetItem *contactItem = new QListWidgetItem;
+    contactItem->setSizeHint(QSize(personList->width()-2,90));
+    personList->addItem(contactItem);
+    personList->setItemWidget(contactItem, contactItemFrame);
 }
 
 void ListBar::setupUi()
@@ -156,7 +184,7 @@ void ListBar::setupStackBar()
     //END MESSAGE LIST
 
     // CONTACT FRAME
-    QFrame *contactFrame = new QFrame;
+    contactFrame = new QFrame;
     contactFrame->setFrameShape(QFrame::Box);
     contactFrame->setLineWidth(0);
     contactFrame->setFixedWidth(308);
@@ -165,7 +193,7 @@ void ListBar::setupStackBar()
     contactLayout->setAlignment(Qt::AlignTop);
 
     // TAB FRAME
-    QFrame *tabCFrame = new QFrame;
+    tabCFrame = new QFrame;
     tabCFrame->setFixedHeight(72);
     QHBoxLayout *tabCLayout = new QHBoxLayout;
     tabCLayout->setContentsMargins(10,0,10,0);
@@ -193,7 +221,7 @@ void ListBar::setupStackBar()
     // END TAB FRAME
 
     // CONTACT LIST
-    QFrame *stackCFrame = new QFrame;
+    stackCFrame = new QFrame;
     stackCFrame->setFixedWidth(contactFrame->width()-20);
     stackCFrame->setFrameStyle(QFrame::Box);
     stackCFrame->setLineWidth(0);
@@ -201,7 +229,7 @@ void ListBar::setupStackBar()
     stackCLayout->setContentsMargins(0,0,0,0);
     stackCLayout->setSpacing(0);
 
-    QListWidget *personList = new QListWidget;
+    personList = new QListWidget;
     for (int i=0; i<fakeListData->size();i++) {
         QFrame *contactItemFrame = new QFrame;
         contactItemFrame->setFrameShape(QFrame::Box);
