@@ -230,38 +230,39 @@ bool DataBase::isUserOnline(int id){
 
 //message相关代码
 void DataBase::addMessage(QJsonObject jsonMessage){
-    QVariantList idSender;idSender << jsonMessage["sender"].toInt();
-    QVariantList idReceiver;idReceiver << jsonMessage["receiver"].toInt();
-    QVariantList timestamp;timestamp << jsonMessage["timeStamp"].toInt();
-    QVariantList type;type << jsonMessage["type"].toString();
-    QVariantList data;data << jsonMessage["data"].toString();
-    query.prepare("INSERT INTO message VALUES (?,?,?,?,?)");
+    int idSender = jsonMessage["sender"].toInt();
+    int idReceiver = jsonMessage["receiver"].toInt();
+    int timestamp = jsonMessage["timestamp"].toInt();
+    QString type = jsonMessage["type"].toString();
+    QString messageData = jsonMessage["data"].toString();
+
+    query.prepare("INSERT INTO message(sender, receiver, timestamp, type, data) VALUES (?, ?, ?, ?, ?)");
     query.addBindValue(idSender);
     query.addBindValue(idReceiver);
     query.addBindValue(timestamp);
     query.addBindValue(type);
-    query.addBindValue(data);
-    if(!query.execBatch())
+    query.addBindValue(messageData);
+
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
 }
 
 void DataBase::getMessage(int receiver, QList<QJsonObject> &jsonMessageList){
     query.prepare("SELECT * FROM message WHERE receiver=?");
-    QVariantList a;
-    a << receiver;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(receiver); // 直接传递整数
+    if(!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
     while(query.next()){
         QJsonObject jsonMessage;
-        jsonMessage["sender"] = query.value("sender").toString();
-        jsonMessage["receiver"] = query.value("receiver").toString();
-        jsonMessage["timestamp"] = query.value("timestamp").toString();
+        jsonMessage["sender"] = query.value("sender").toInt(); // 转换为整数
+        jsonMessage["receiver"] = query.value("receiver").toInt(); // 转换为整数
+        jsonMessage["timestamp"] = query.value("timestamp").toInt(); // 转换为整数
         jsonMessage["type"] = query.value("type").toString();
         jsonMessage["data"] = query.value("data").toString();
         jsonMessageList.append(jsonMessage);
     }
 }
+
 
 void DataBase::deleteMessage(int id){
     query.prepare("delete FROM message WHERE receiver=?");

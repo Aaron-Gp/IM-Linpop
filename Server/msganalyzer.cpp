@@ -11,14 +11,13 @@ MsgAnalyzer::~MsgAnalyzer(){
 }
 
 void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-    int timeStamp=QDateTime::currentMSecsSinceEpoch();
-    information["timeStamp"]=timeStamp;
+    int timestamp=QDateTime::currentMSecsSinceEpoch();
+    information["timestamp"]=timestamp;
     if(information["type"]=="file"){
-        FileManager::ToFlie(information["data"].toString(),FILE_PATH,information["fileName"].toString(),information["sender"].toInt(),information["receiver"].toInt(),information["timeStamp"].toInt());
+        FileManager::ToFlie(information["data"].toString(),FILE_PATH,information["fileName"].toString(),information["sender"].toInt(),information["receiver"].toInt(),information["timestamp"].toInt());
         information["data"]=information["fileName"];
     }
-    else
-        db.addMessage(information);
+    db.addMessage(information);
 }
 
 void MsgAnalyzer::sendError(QTcpSocket* socket,QString error){
@@ -65,8 +64,8 @@ void MsgAnalyzer::anaylze(){
                         for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++){//找到对应id的socket
                             if (iter->id==information["receiver"].toInt()){
                                 if(iter->sock->state()!=QAbstractSocket::UnconnectedState){
-                                    int timeStamp=QDateTime::currentMSecsSinceEpoch();
-                                    information["timeStamp"]=timeStamp;
+                                    int timestamp=QDateTime::currentMSecsSinceEpoch();
+                                    information["timestamp"]=timestamp;
                                     sendJson(iter->sock,information);
                                     flag=1;
                                     break;
@@ -98,11 +97,11 @@ void MsgAnalyzer::anaylze(){
                     for (QList<QJsonObject>::iterator iter = jsonList.begin(); iter != jsonList.end(); iter++){
                         if((*iter)["type"]=="file"){
                             (*iter)["fileName"]=(*iter)["data"];
-                            (*iter)["data"]=FileManager::ToString(FILE_PATH,(*iter)["fileName"].toString(),(*iter)["sender"].toInt(),(*iter)["receiver"].toInt(),(*iter)["timeStamp"].toInt());
-                            FileManager::deleteFile(FILE_PATH,(*iter)["fileName"].toString(),(*iter)["sender"].toInt(),(*iter)["receiver"].toInt(),(*iter)["timeStamp"].toInt());
+                            (*iter)["data"]=FileManager::ToString(FILE_PATH,(*iter)["fileName"].toString(),(*iter)["sender"].toInt(),(*iter)["receiver"].toInt(),(*iter)["timestamp"].toInt());
+                            FileManager::deleteFile(FILE_PATH,(*iter)["fileName"].toString(),(*iter)["sender"].toInt(),(*iter)["receiver"].toInt(),(*iter)["timestamp"].toInt());
                         }
-                        else
-                            sendJson(msg.socket,*iter);
+                        (*iter)["size"]=(*iter)["data"].toString().length();
+                        sendJson(msg.socket,*iter);
                     }
                     db.deleteMessage(information["sender"].toInt());
                 }
