@@ -17,6 +17,7 @@ class QListWidget;
 class QListWidgetItem;
 class QSplitter;
 class QPushButton;
+class QToolButton;
 
 class MainBar : public QFrame
 {
@@ -31,6 +32,8 @@ public:
     void clearBroswer();
 
     QPushButton *sendBtn;
+    QFrame *historyFrame, *toolCFrame, *chatFrame, *chatCFrame, *sendCFrame;
+    QToolButton *emojiBtn, *imageBtn, *fileBtn;
 
 private:
     void setupUi();

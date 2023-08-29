@@ -63,19 +63,18 @@ void MainBar::setupMainBar()
     m_splitter->setChildrenCollapsible(false);
     m_splitter->setHandleWidth(1);
 
-    QFrame *historyFrame = new QFrame(m_splitter);
+    historyFrame = new QFrame(m_splitter);
     historyFrame->setLineWidth(0);
     historyFrame->setFrameShape(QFrame::Box);
     QHBoxLayout *historyLayout = new QHBoxLayout;
     historyLayout->setAlignment(Qt::AlignLeft);
-    QListWidget *historyList = new QListWidget;
-    m_chatBroswer = historyList;
+    m_chatBroswer = new QListWidget;
 
     historyLayout->addWidget(m_chatBroswer);
     historyFrame->setLayout(historyLayout);
     m_splitter->addWidget(historyFrame);
 
-    QFrame *chatFrame = new QFrame(m_splitter);
+    chatFrame = new QFrame(m_splitter);
     chatFrame->setLineWidth(0);
     chatFrame->setFrameShape(QFrame::Box);
     chatFrame->setMinimumHeight(200);
@@ -85,7 +84,7 @@ void MainBar::setupMainBar()
     chatLayout->setAlignment(Qt::AlignTop);
 
     // TOOLCFRAME
-    QFrame *toolCFrame = new QFrame;
+    toolCFrame = new QFrame;
     toolCFrame->setFrameShape(QFrame::Box);
     toolCFrame->setLineWidth(0);
     toolCFrame->setFixedHeight(48);
@@ -101,19 +100,19 @@ void MainBar::setupMainBar()
     toolCLayout->setContentsMargins(10,0,10,0);
     toolCLayout->setSpacing(10);
     toolCLayout->setAlignment(Qt::AlignLeft);
-    QToolButton *emojiBtn = new QToolButton;
+    emojiBtn = new QToolButton;
     emojiBtn->setIcon(QIcon(":/icons/emoji"));
     emojiBtn->setIconSize(QSize(32,32));
 
     toolCLayout->addWidget(emojiBtn);
 
-    QToolButton *imageBtn = new QToolButton;
+    imageBtn = new QToolButton;
     imageBtn->setIcon(QIcon(":/icons/picture"));
     imageBtn->setIconSize(QSize(32,32));
 
     toolCLayout->addWidget(imageBtn);
 
-    QToolButton *fileBtn = new QToolButton;
+    fileBtn = new QToolButton;
     fileBtn->setIcon(QIcon(":/icons/file"));
     fileBtn->setIconSize(QSize(32,32));
 
@@ -121,21 +120,19 @@ void MainBar::setupMainBar()
     toolCFrame->setLayout(toolCLayout);
     chatLayout->addWidget(toolCFrame);
     // END TOOLCFRAME
-
-    QFrame *chatCFrame = new QFrame;
+    chatCFrame = new QFrame;
     chatCFrame->setFrameShape(QFrame::Box);
     chatCFrame->setLineWidth(0);
     QHBoxLayout *chatCLayout = new QHBoxLayout;
     chatCLayout->setContentsMargins(10,0,10,0);
 
-    QTextEdit *chateditor = new QTextEdit;
-    m_chatEditor = chateditor;
-    chatCLayout->addWidget(chateditor);
+    m_chatEditor = new QTextEdit;
+    chatCLayout->addWidget(m_chatEditor);
     chatCFrame->setLayout(chatCLayout);
     chatLayout->addWidget(chatCFrame);
     chatLayout->setStretchFactor(chatCFrame, 1);
 
-    QFrame *sendCFrame = new QFrame;
+    sendCFrame = new QFrame;
     sendCFrame->setFrameShape(QFrame::Box);
     sendCFrame->setLineWidth(0);
     sendCFrame->setFixedHeight(48);

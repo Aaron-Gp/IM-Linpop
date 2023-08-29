@@ -73,14 +73,16 @@ MainWindow::MainWindow(QWidget *parent)
     m_client = new TcpClient;
     connect(m_listBar->addContactBtn, &QToolButton::clicked, [&](){
         QString ip = m_listBar->searchBar->text();
-        m_client->newConnection(ip);
-        // 列表增加一项
-        m_listBar->addContact(m_profile->m_contactProfile.last());
-        m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
-        MYLOG<<"add contact";
-        //面板更新
-        m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
-        MYLOG<<"change bar";
+        bool success = m_client->newConnection(ip);
+        if(success){
+            // 列表增加一项
+            m_listBar->addContact(m_profile->m_contactProfile.last());
+            m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
+            MYLOG<<"add contact";
+            //面板更新
+            m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
+            MYLOG<<"change bar";
+        }
     });
 
     connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){

@@ -2,6 +2,7 @@ QT += core gui widgets network sql
 TEMPLATE = app
 CONFIG += c++11
 SOURCES = main.cpp \
+    cabstractemojitable.cpp \
     listbar.cpp \
     mainbar.cpp \
     mainwindow.cpp \
@@ -11,6 +12,7 @@ SOURCES = main.cpp \
     tcpclient.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
+    cabstractemojitable.h \
     listbar.h \
     mainbar.h \
     profilemanager.h \

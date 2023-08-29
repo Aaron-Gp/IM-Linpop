@@ -14,7 +14,7 @@ class TcpClient : public QWidget
     Q_OBJECT
 public:
     explicit TcpClient(QWidget *parent = nullptr);
-    void newConnection(QString ip);
+    bool newConnection(QString ip);
     void sendData(QString ip, QString msg);
     ~TcpClient();
     ProfileManager *m_profile;

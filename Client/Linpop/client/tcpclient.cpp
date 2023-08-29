@@ -8,7 +8,7 @@ TcpClient::TcpClient(QWidget *parent) : QWidget(parent)
     m_profile = ProfileManager::getInstance();
 }
 
-void TcpClient::newConnection(QString ip)
+bool TcpClient::newConnection(QString ip)
 {
     //初始化TCP客户端
     QTcpSocket *tcpClient = new QTcpSocket();   //实例化tcpClient
@@ -34,6 +34,7 @@ void TcpClient::newConnection(QString ip)
         tcpClient->write(data.toUtf8());
     }else{
         MYLOG<<"fail to connect "<<ip;
+        return false;
     }
     connect(tcpClient, &QTcpSocket::readyRead, [=](){
         MYLOG<<"readyRead";
@@ -59,6 +60,7 @@ void TcpClient::newConnection(QString ip)
         msgBox.setText(tr("failed to connect server because %1").arg(tcpClient->errorString()));
         msgBox.exec();
     });
+    return true;
 }
 
 void TcpClient::sendData(QString ip, QString msg)
