@@ -51,6 +51,12 @@ bool ServerDataBase::connectDataBase(){
         qDebug() << "Failed to create table message:" << query.lastError();
     }
 
+    // 创建用户的视图，包括头像avatar,工号id,ip,姓名name,部门department,在线情况online
+    if (!query.exec("CREATE View user_view AS SELECT avatar, id, ip, name, department, online from user")) {
+        qDebug() << "Failed to create view user_view:" << query.lastError();
+    }
+
+
     return true;
 }
 
@@ -67,7 +73,7 @@ bool ServerDataBase::isUserAccountCorrect(QString id, QString password){
 
     if(query.next()){
         QString passwordToId = query.value("password").toString();
-        if(password!=passwordToId){
+        if(encryptUserPassword(password)!= passwordToId){
             qDebug() << "The password is wrong."; //密码错误
             return false;
         }
@@ -113,7 +119,7 @@ bool ServerDataBase::addUserAccount(QString id, QString name, QString password){
     }else{
         query.prepare("INSERT INTO user (id, name, password) VALUES (?, ?, ?)");
         b << name;
-        c << password;
+        c << encryptUserPassword(password);
         query.addBindValue(a);
         query.addBindValue(b);
         query.addBindValue(c);
@@ -140,13 +146,13 @@ bool ServerDataBase::alterUserPassword(QString id, QString passwordOld, QString 
         return false;//账户不存在
     }else{
         QString passwordToId = query.value("password").toString();
-        if(passwordToId!=passwordOld){
+        if(passwordToId!=encryptUserPassword(passwordOld)){
             qDebug() << "The old password isn't correct.";
             return false;//原密码不正确
         }else{
             query.prepare("UPDATE user SET password = ? WHERE id = ?");
             QVariantList a,b;
-            a << passwordNew;
+            a << encryptUserPassword(passwordNew);
             b << id;
             query.addBindValue(a);
             query.addBindValue(b);
@@ -227,6 +233,35 @@ bool ServerDataBase::isUserOnline(QString id){
     }
     qDebug() << "Failed to find the id.";
     return false;//id不存在
+}
+
+QString ServerDataBase::encryptUserPassword(QString password){
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    hash.addData(password.toUtf8());
+    QString hashedPassword = hash.result().toHex();
+    return hashedPassword;
+}
+
+bool ServerDataBase::getUserView(QString id, QJsonObject &jsonUserView){
+    query.prepare("SELECT * FROM user_view WHERE id = ?");
+    QVariantList a;
+    a << id;
+    query.addBindValue(a);
+    if(!query.execBatch()){
+        qDebug() << "Failed to select from user_view: " << query.lastError();
+        return false;
+    }
+    if(!query.next()){
+        qDebug() << "The id doesn't exist." << query.lastError();
+    }
+    jsonUserView["avatar"] = query.value("avatar").toString();
+    jsonUserView["id"] = id;
+    jsonUserView["ip"] = query.value("ip").toString();
+    jsonUserView["name"] = query.value("name").toString();
+    jsonUserView["department"] = query.value("department").toString();
+    jsonUserView["online"] = query.value("department").toInt();
+    qDebug() << "Succeed to select from user_view!";
+    return true;
 }
 
 //message相关代码
