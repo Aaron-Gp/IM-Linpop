@@ -39,7 +39,7 @@ void SocketTask::run(){
             else
                 QThread::msleep(50);
             if(timer.hasExpired(Timeout)){
-                QMetaObject::invokeMethod(m_pObj, "SendMsg",
+                QMetaObject::invokeMethod(m_pObj, "SendMsgTo",
                                           Q_ARG(QTcpSocket*, socket),
                                           Q_ARG(Msg,Msg(socket,socket->peerPort(), socket->peerAddress().toString(), "time out")));
                 QMetaObject::invokeMethod(m_pObj, "reconnect",
@@ -57,7 +57,7 @@ void SocketTask::run(){
                 }else{
                     //throw std::runtime_error("invalid information");
                     qDebug() << "invalid message:" << receivedData;
-                    QMetaObject::invokeMethod(m_pObj, "SendMsg",
+                    QMetaObject::invokeMethod(m_pObj, "SendMsgTo",
                                               Q_ARG(QTcpSocket*, socket),
                                               Q_ARG(Msg,Msg(socket,socket->peerPort(), socket->peerAddress().toString(), "invalid input")));
                     QMetaObject::invokeMethod(m_pObj, "reconnect",

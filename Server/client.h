@@ -11,6 +11,7 @@ public:
     QTcpSocket* sock;  // 用于存储客户端的 socket 连接
     int id=0;
     Client(int port,QString ip,QTcpSocket* sock);
+    void sendMsg(QString string);
 };
 
 #endif // CLIENT_H

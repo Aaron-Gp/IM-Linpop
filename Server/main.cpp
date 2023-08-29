@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include "msg.h"
+#include "filemanager.h"
 
 int main(int argc, char *argv[]){
     qRegisterMetaType<Msg>("Msg");

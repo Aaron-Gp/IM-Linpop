@@ -13,6 +13,7 @@ CONFIG += c++17
 SOURCES += \
     client.cpp \
     database.cpp \
+    filemanager.cpp \
     main.cpp \
     mainwindow.cpp \
     msg.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     Definition.h \
     client.h \
     database.h \
+    filemanager.h \
     mainwindow.h \
     msg.h \
     msganalyzer.h \
