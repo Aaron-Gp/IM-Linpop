@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="avatar">assets/avatar.jpg</file>
+        <file alias="chat">assets/chat-dots-fill.svg</file>
+        <file alias="person">assets/person-fill.svg</file>
+        <file alias="add-person">assets/person-fill-add.svg</file>
+        <file alias="setting">assets/list.svg</file>
+        <file alias="search">assets/search.svg</file>
+        <file alias="picture">assets/image.svg</file>
+        <file alias="file">assets/file.svg</file>
+        <file alias="emoji">assets/emoji.svg</file>
+        <file alias="p2p">assets/p2p.svg</file>
+    </qresource>
+</RCC>
