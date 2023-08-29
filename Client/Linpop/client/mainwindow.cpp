@@ -102,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_server = new TcpServer;
     MYLOG<<QNetworkInterface().allAddresses();
     m_listBar->m_localIpLabel->setText(QNetworkInterface().allAddresses().at(2).toString()); // 存储本地ip
-    m_profile->m_ip = QNetworkInterface().allAddresses().at(2).toString() + ":8000"; // 存储本地ip
+    m_profile->m_ip = QNetworkInterface().allAddresses().at(2).toString(); // 存储本地ip
 
     connect(m_listBar->portSubmitBtn, &QPushButton::clicked, [&](){
         if(m_listBar->portSubmitBtn->text()=="连接"){
