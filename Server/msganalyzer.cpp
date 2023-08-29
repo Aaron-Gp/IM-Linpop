@@ -80,7 +80,7 @@ void MsgAnalyzer::anaylze(){
                 }
             }
             if(information["function"].toString()=="login"){
-                switch(db.isUserAccountCorrect(information["sender"].toInt(),information["password"].toString())){
+                switch(db.isUserAccountCorrect(information["sender"].toInt(),information["password"].toString(),msg.socket->peerAddress().toString())){
                 case 1:
                     sendResult(msg.socket,"result","account not found");
                     break;
@@ -92,6 +92,7 @@ void MsgAnalyzer::anaylze(){
                         if (msg.socket==iter->sock)
                             iter->id=information["sender"].toInt();
                     sendResult(msg.socket,"result","success");//在isUserAccountCorrect中已更改登录状态
+
                     QList<QJsonObject> jsonList;
                     db.getMessage(information["sender"].toInt(),jsonList);
                     for (QList<QJsonObject>::iterator iter = jsonList.begin(); iter != jsonList.end(); iter++){

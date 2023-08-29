@@ -76,25 +76,26 @@ void DataBase::ShowInComboBox(QComboBox* cb, QString sql){
     }
 }
 
-int DataBase::isUserAccountCorrect(int id, QString password){//1 means account not found,2 means password incorrect,3 means success
-    query.prepare("SELECT * FROM user WHERE id = ? ");
-    QVariantList a;//a用来存储id
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+int DataBase::isUserAccountCorrect(int id, QString password, QString ip) {//1 means account not found,2 means password incorrect,3 means success
+    query.prepare("SELECT * FROM user WHERE id = ?");
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(query.next()){
+    if (query.next()) {
         QString passwordToId = query.value("password").toString();
-        if(password!=passwordToId)
+        if (password != passwordToId)
             return 2;
-    }else
+    } else {
         return 1;
-    query.prepare("UPDATE user SET online = 1 WHERE id = ?");//账号登陆状态为已登陆
-    query.addBindValue(a);
-    if(!query.execBatch())
+    }
+    query.prepare("UPDATE user SET online = 1, ip = ? WHERE id = ?");
+    query.addBindValue(ip);
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
     return 3;
 }
+
 
 void DataBase::setUserAccountOffline(int id){
     query.prepare("UPDATE user SET online = 0 WHERE id = ?");
@@ -118,114 +119,100 @@ QString DataBase::generateRandomPassword(int length) {
 }
 
 
-QJsonObject DataBase::addUserAccount(int id, QString name, int department){
+QJsonObject DataBase::addUserAccount(int id, QString name, int department) {
     query.prepare("SELECT * FROM user WHERE id = ?");
-    QVariantList a,b,c,d;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(query.next())
+    if (query.next())
         throw std::runtime_error("Database error: id exists");
-    else{
-        query.prepare("INSERT INTO user (id, name, department,password) VALUES (?, ?, ?,?)");
-        b << name;
-        c << department;
-        QString password=DataBase::generateRandomPassword(20);
-        query.addBindValue(a);
-        query.addBindValue(b);
-        query.addBindValue(c);
-        query.addBindValue(d);
-        if(!query.execBatch())
+    else {
+        query.prepare("INSERT INTO user (id, name, department, password) VALUES (?, ?, ?, ?)");
+        query.addBindValue(id);
+        query.addBindValue(name);
+        query.addBindValue(department);
+        // Generate and set password here
+        QString password = generateRandomPassword(20); // Make sure to implement this method
+        query.addBindValue(password);
+        if (!query.exec())
             throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
         QJsonObject json;
-        json["id"]=id;
-        json["name"]=name;
-        json["department"]=department;
-        json["password"]=password;
-        qDebug() << "Succeed to add account!";//成功添加账户
+        json["id"] = id;
+        json["name"] = name;
+        json["department"] = department;
+        json["password"] = password;
+        qDebug() << "Succeed to add account!"; // 成功添加账户
         return json;
     }
 }
 
-QString DataBase::alterUserPassword(int id, QString passwordOld, QString passwordNew){
+
+QString DataBase::alterUserPassword(int id, QString passwordOld, QString passwordNew) {
     query.prepare("SELECT * FROM user WHERE id = ?");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(!query.next())
+    if (!query.next())
         return "The id doesn't exist.";
-    else{
+    else {
         QString passwordToId = query.value("password").toString();
-        if(passwordToId!=passwordOld)
+        if (passwordToId != passwordOld)
             return "The old password isn't correct.";
-        else{
+        else {
             query.prepare("UPDATE user SET password = ? WHERE id = ?");
-            QVariantList a,b;
-            a << passwordNew;
-            b << id;
-            query.addBindValue(a);
-            query.addBindValue(b);
-            if(!query.execBatch())
+            query.addBindValue(passwordNew);
+            query.addBindValue(id);
+            if (!query.exec())
                 throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
             return "success";
         }
     }
 }
 
-QString DataBase::alterUserName(int id, QString name){
+
+QString DataBase::alterUserName(int id, QString name) {
     query.prepare("SELECT * FROM user WHERE id = ?");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(!query.next())
+    if (!query.next())
         return "The id doesn't exist.";
-    else{
+    else {
         query.prepare("UPDATE user SET name = ? WHERE id = ?");
-        QVariantList a,b;
-        a << name;
-        b << id;
-        query.addBindValue(a);
-        query.addBindValue(b);
-        if(!query.execBatch())
+        query.addBindValue(name);
+        query.addBindValue(id);
+        if (!query.exec())
             throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-        return "success";//成功修改用户名
+        return "success"; // 成功修改用户名
     }
 }
 
-void DataBase::deleteUserAccount(int id){
+void DataBase::deleteUserAccount(int id) {
     query.prepare("SELECT * FROM user WHERE id = ?");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(!query.next())
+    if (!query.next())
         throw std::runtime_error("The id doesn't exist.");
-    else{
+    else {
         query.prepare("DELETE FROM user WHERE id = ?");
-        query.addBindValue(a);
-        if(!query.execBatch())
+        query.addBindValue(id);
+        if (!query.exec())
             throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
     }
 }
 
-bool DataBase::isUserOnline(int id){
+
+bool DataBase::isUserOnline(int id) {
     query.prepare("SELECT online FROM user WHERE id = ?");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
-    if(query.next()){
-        int online=query.value("online").toBool();
+    if (query.next()) {
+        int online = query.value("online").toInt(); // 转换为整数
         return online;
     }
-    throw std::runtime_error("Failed to find the id.");
+    throw std::runtime_error("Failed to find user with id: " + QString::number(id).toStdString());
 }
 
 //message相关代码
@@ -235,14 +222,12 @@ void DataBase::addMessage(QJsonObject jsonMessage){
     int timestamp = jsonMessage["timestamp"].toInt();
     QString type = jsonMessage["type"].toString();
     QString messageData = jsonMessage["data"].toString();
-
     query.prepare("INSERT INTO message(sender, receiver, timestamp, type, data) VALUES (?, ?, ?, ?, ?)");
     query.addBindValue(idSender);
     query.addBindValue(idReceiver);
     query.addBindValue(timestamp);
     query.addBindValue(type);
     query.addBindValue(messageData);
-
     if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
 }
@@ -264,14 +249,13 @@ void DataBase::getMessage(int receiver, QList<QJsonObject> &jsonMessageList){
 }
 
 
-void DataBase::deleteMessage(int id){
-    query.prepare("delete FROM message WHERE receiver=?");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch())
+void DataBase::deleteMessage(int id) {
+    query.prepare("DELETE FROM message WHERE receiver = ?");
+    query.addBindValue(id);
+    if (!query.exec())
         throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
 }
+
 
 void DataBase::printTableUser(){
     if(!query.exec("SELECT * FROM user"))

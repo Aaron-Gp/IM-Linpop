@@ -27,7 +27,7 @@ public:
 public:
     QSqlQuery query;
     QSqlDatabase database;
-    int isUserAccountCorrect(int id, QString password);
+    int isUserAccountCorrect(int id, QString password,QString ip);
     void setUserAccountOffline(int id);
     static QString generateRandomPassword(int length);
     QJsonObject addUserAccount(int id, QString name, int department);
