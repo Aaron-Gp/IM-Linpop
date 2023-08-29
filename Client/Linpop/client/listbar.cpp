@@ -18,8 +18,40 @@ ListBar::ListBar(QWidget *parent) : QFrame(parent)
     m_layout->setContentsMargins(0,0,0,0);
     m_layout->setSpacing(0);
     setLayout(m_layout);
+    m_profile = ProfileManager::getInstance();
     makeFakeData();
     setupUi();
+}
+
+void ListBar::addContact(profile pf)
+{
+    QFrame *messageItemFrame = new QFrame;
+    messageItemFrame->setFrameShape(QFrame::Box);
+    messageItemFrame->setLineWidth(0);
+    messageItemFrame->setFixedHeight(90);
+    QHBoxLayout *messageItemLayout = new QHBoxLayout;
+
+    QLabel *avatar = new QLabel;
+    avatar->setStyleSheet("QLabel{"
+                          "border-radius:30px;"
+                          "border-image:url("+pf.avatar+");"
+                          "}");
+    avatar->setFixedSize(60,60);
+    messageItemLayout->addWidget(avatar);
+
+    QVBoxLayout *rightMILayout = new QVBoxLayout;
+    rightMILayout->setContentsMargins(0,0,0,0);
+    QLabel *msg = new QLabel(pf.name+"("+pf.ip+")");
+    rightMILayout->addWidget(msg);
+
+    messageItemLayout->addLayout(rightMILayout);
+    messageItemFrame->setLayout(messageItemLayout);
+
+    QListWidgetItem *messageItem = new QListWidgetItem;
+
+    messageItem->setSizeHint(QSize(messageWidget->width(),90));
+    messageWidget->addItem(messageItem);
+    messageWidget->setItemWidget(messageItem, messageItemFrame);
 }
 
 void ListBar::setupUi()
@@ -228,12 +260,11 @@ void ListBar::setupStackBar()
     m_layout->addWidget(stackLFrame);
 }
 
-
 void ListBar::makeFakeData()
 {
     fakeListData = new QJsonArray;
-    QVector<QString> ips = {"127.0.0.1","127.0.0.2","126.0.0.3"};
-    QVector<QString> names = {"张三","李四","王五"};
+    QVector<QString> ips = {};
+    QVector<QString> names = {};
     for(int i=0;i<ips.length();i++){
         QJsonObject obj;
         obj.insert("name",names[i]);

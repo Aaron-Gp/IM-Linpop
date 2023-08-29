@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 //#define QT_NO_DEBUG_OUTPUT
 
 #include <QMainWindow>

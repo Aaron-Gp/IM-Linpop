@@ -24,6 +24,7 @@ MainBar::MainBar(QWidget *parent) : QFrame(parent)
     m_layout->setSpacing(0);
     m_profile = ProfileManager::getInstance();
     setLayout(m_layout);
+    setupUi();
 }
 
 void MainBar::setupUi()
@@ -142,32 +143,7 @@ void MainBar::setupMainBar()
     sendCLayout->setContentsMargins(10,0,10,0);
     sendCLayout->setSpacing(10);
     sendCLayout->setAlignment(Qt::AlignRight);
-    QPushButton *sendBtn = new QPushButton("发送");
-    connect(sendBtn, &QPushButton::clicked, [&](){
-        QString editorMsg = m_chatEditor->toPlainText();
-        m_chatEditor->setText("");
-        QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
-        qDebug()<<"addMessage" << editorMsg << time << m_chatBroswer->count();
-
-        if(m_chatBroswer->count()%2) {
-            if(editorMsg != "") {
-                QMap<QString,QString> msg;
-                msg.insert("ip", "127.0.0.1");
-                msg.insert("msg", editorMsg);
-                msg.insert("time", time);
-                addMessage(msg);
-            }
-        } else {
-            if(editorMsg != "") {
-                QMap<QString,QString> msg;
-                msg.insert("ip", "127.0.0.2");
-                msg.insert("msg", editorMsg);
-                msg.insert("time", time);
-                addMessage(msg);
-            }
-        }
-        m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
-    });
+    sendBtn = new QPushButton("发送");
     sendCLayout->addWidget(sendBtn);
     sendCFrame->setLayout(sendCLayout);
     chatLayout->addWidget(sendCFrame);
@@ -180,25 +156,19 @@ void MainBar::setupMainBar()
 
 void MainBar::changeBar(QString name, QString ip)
 {
-    if(m_title==""){
-        m_title=name+ip;
-        setupUi();
-    }
-    else{
-        m_title=name+ip;
-        QLabel *title = m_topBar->findChild<QLabel*>();
-        title->setText(m_title);
-        clearBroswer();
-    }
+    m_title=name+ip;
+    QLabel *title = m_topBar->findChild<QLabel*>();
+    title->setText(m_title);
+    clearBroswer();
 }
 
-void MainBar::addMessage(QMap<QString,QString> msg)
+void MainBar::addMessage(message msg)
 {
-    QString time = msg["time"];
+    QString time = msg.time;
     dealMessageTime(time);
-    QString message = msg["msg"];
-    QString ip = msg["ip"];
-    qDebug()<<time<<" "<<message<<" "<<ip;
+    QString message = msg.msg;
+    QString ip = msg.ip;
+    MYLOG<<time<<" "<<message<<" "<<ip;
     QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
@@ -211,7 +181,7 @@ void MainBar::addMessage(QMap<QString,QString> msg)
     m_chatBroswer->setCurrentRow(m_chatBroswer->count()-1);
 }
 
-void MainBar::addMessages(QVector<QMap<QString, QString>> msgs)
+void MainBar::addMessages(Message msgs)
 {
 
 }
@@ -239,7 +209,7 @@ void MainBar::dealMessageTime(QString curMsgTime)
         QNChatMessage* messageW = (QNChatMessage*)m_chatBroswer->itemWidget(lastItem);
         int lastTime = messageW->time().toInt();
         int curTime = curMsgTime.toInt();
-        qDebug() << "curTime lastTime:" << curTime - lastTime;
+        MYLOG << "curTime lastTime:" << curTime - lastTime;
         isShowTime = ((curTime - lastTime) > 60); // 两个消息相差一分钟
     } else {
         isShowTime = true;

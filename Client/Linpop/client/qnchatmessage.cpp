@@ -125,6 +125,7 @@ QSize QNChatMessage::getRealString(QString src)
     } else {
         for(int i = 0; i < (nCount + 1); i++) {
             QString value = src.split("\n").at(i);
+            MYLOG<<value;
             nMaxWidth = fm.width(value) > nMaxWidth ? fm.width(value) : nMaxWidth;
             if(fm.width(value) > m_textWidth) {
                 nMaxWidth = m_textWidth;
@@ -140,7 +141,7 @@ QSize QNChatMessage::getRealString(QString src)
             }
         }
     }
-    return QSize(nMaxWidth+m_spaceWid, (nCount + 1) * m_lineHeight+2*m_lineHeight);
+    return QSize(nMaxWidth+m_spaceWid, (nCount + 1) * m_lineHeight+4*m_lineHeight);
 }
 
 void QNChatMessage::paintEvent(QPaintEvent *event)
@@ -224,7 +225,6 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         penText.setColor(QColor(153,153,153));
         painter.setPen(penText);
         QTextOption option(Qt::AlignCenter);
-        option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         QFont te_font = this->font();
         te_font.setFamily("MicrosoftYaHei");
         te_font.setPointSize(10);

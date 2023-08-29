@@ -1,4 +1,5 @@
 #include "tcpserver.h"
+#include <QDateTime>
 
 TcpServer::TcpServer(QWidget *parent) : QWidget(parent)
 {
@@ -14,15 +15,16 @@ TcpServer::~TcpServer()
 
 void TcpServer::closeAll()
 {
-    for(int i=0; i<tcpClient.length(); i++)//断开所有连接
+    for(auto iter=m_tcpClient.begin(); iter!=m_tcpClient.end(); ++iter)//断开所有连接
     {
-        tcpClient[i]->disconnectFromHost();
-        bool ok = tcpClient[i]->waitForDisconnected(1000);
+        QTcpSocket *tcpClien = iter.value();
+        tcpClien->disconnectFromHost();
+        bool ok = tcpClien->waitForDisconnected(1000);
         if(!ok)
         {
             // 处理异常
         }
-        tcpClient.removeAt(i);  //从保存的客户端列表中取去除
+        m_tcpClient.remove(iter.key());  //从保存的客户端列表中取去除
     }
     tcpServer->close();     //不再监听端口
 }
@@ -30,57 +32,45 @@ void TcpServer::closeAll()
 void TcpServer::NewConnectionSlot()
 {
     currentClient = tcpServer->nextPendingConnection();
-    tcpClient.append(currentClient);
-//    ui->cbxConnection->addItem(tr("%1:%2").arg(currentClient->peerAddress().toString().split("::ffff:")[1])\
-//                                          .arg(currentClient->peerPort()));
-    connect(currentClient, SIGNAL(readyRead()), this, SLOT(ReadData()));
-    connect(currentClient, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()));
-    qDebug()<<"new connection from "<<currentClient->peerAddress().toString().split("::ffff:")[1]<<currentClient->peerPort();
+    QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+currentClient->peerPort();
+    MYLOG<<"new connection from "<<ip;
 
-    Dict newContact;
-    newContact.insert("ip", currentClient->peerAddress().toString().split("::ffff:")[1]+currentClient->peerPort());
-    m_profile->m_contact.append(newContact);
+    connect(currentClient, &QTcpSocket::readyRead, [&](){
+        QByteArray buffer = currentClient->readAll();
+        if(!buffer.isEmpty()){
+            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+currentClient->peerPort();
+            MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
+            message msg;
+            msg.msg = QString::fromUtf8(buffer);
+            msg.ip=ip;
+            msg.time=QString::number(QDateTime::currentDateTime().toTime_t());
+            emit appendMsg(ip, msg);
+        }
+    });
 
+    connect(currentClient, &QTcpSocket::disconnected, [&](){
+        if(currentClient->state() == QAbstractSocket::UnconnectedState)
+        {
+            // 删除存储在tcpClient列表中的客户端信息
+            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+currentClient->peerPort();
+            currentClient->destroyed();
+            m_tcpClient.remove(ip);
+        }
+    });
 
+    m_tcpClient.insert(ip,currentClient);
+
+    // 如果联系人不存在则创建新的联系人信息和对话信息
+    bool exist = m_profile->m_contact.contains(ip);
+    if(!exist){
+        m_profile->m_contact.append(ip);
+        profile newContact;
+        newContact.ip = ip;
+        m_profile->m_contactProfile.append(newContact);
+        m_profile->m_chatList.insert(ip, Message());
+        emit addContact(newContact);
+    }
     // 打招呼
     QString data = "Hello, you can chat to "+m_profile->m_ip+" now!";
     currentClient->write(data.toUtf8());
-}
-
-void TcpServer::disconnectedSlot()
-{
-    //由于disconnected信号并未提供SocketDescriptor，所以需要遍历寻找
-    for(int i=0; i<tcpClient.length(); i++)
-    {
-        if(tcpClient[i]->state() == QAbstractSocket::UnconnectedState)
-        {
-            // 删除存储在combox中的客户端信息
-//            ui->cbxConnection->removeItem(ui->cbxConnection->findText(tr("%1:%2")\
-//                                  .arg(tcpClient[i]->peerAddress().toString().split("::ffff:")[1])\
-//                                  .arg(tcpClient[i]->peerPort())));
-            // 删除存储在tcpClient列表中的客户端信息
-             tcpClient[i]->destroyed();
-             tcpClient.removeAt(i);
-        }
-    }
-}
-
-// 客户端数据可读信号，对应的读数据槽函数
-void TcpServer::ReadData()
-{
-    // 由于readyRead信号并未提供SocketDecriptor，所以需要遍历所有客户端
-    for(int i=0; i<tcpClient.length(); i++)
-    {
-        QByteArray buffer = tcpClient[i]->readAll();
-        if(buffer.isEmpty())    continue;
-
-        static QString IP_Port, IP_Port_Pre;
-        IP_Port = tr("[%1:%2]:").arg(tcpClient[i]->peerAddress().toString().split("::ffff:")[1])\
-                                     .arg(tcpClient[i]->peerPort());
-
-        qDebug()<<IP_Port<<" : "<<QString::fromUtf8(buffer);
-
-        //更新ip_port
-        IP_Port_Pre = IP_Port;
-    }
 }

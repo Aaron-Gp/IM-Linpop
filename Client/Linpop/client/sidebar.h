@@ -1,5 +1,6 @@
 #ifndef LEFTBAR_H
 #define LEFTBAR_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QFrame>

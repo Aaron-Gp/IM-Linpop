@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_avatar = new QtMaterialAvatar(QImage(":/icons/avatar"));
     m_avatar->setSize(48);
     connect(m_avatar, &QtMaterialAvatar::clicked, [=](){
-        qDebug()<<"avatar clicked";
+        MYLOG<<"avatar clicked";
     });
 
     // WINDOW SETTING
@@ -64,8 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 聊天面板切换
     connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
-        QString name = m_listBar->fakeListData->at(row).toObject()["name"].toString();
-        QString ip = m_listBar->fakeListData->at(row).toObject()["ip"].toString();
+        QString name = m_profile->m_contactProfile.at(row).name;
+        QString ip = m_profile->m_contactProfile.at(row).ip;
         m_mainBar->changeBar(name, ip);
     });
 
@@ -73,46 +73,96 @@ MainWindow::MainWindow(QWidget *parent)
     m_client = new TcpClient;
     connect(m_listBar->addContactBtn, &QToolButton::clicked, [&](){
         QString ip = m_listBar->searchBar->text();
-        m_client->tcpClient->connectToHost(ip, 8000);
-        bool ok = m_client->tcpClient->waitForConnected(1000);
-        if (ok)
-        {
-            QString data = "hello from client!";
-            m_client->tcpClient->write(data.toUtf8());
-            Dict newContact;
-            newContact.insert("ip", m_client->tcpClient->peerAddress().toString().split("::ffff:")[1]+m_client->tcpClient->peerPort());
-            m_profile->m_contact.append(newContact);
-        }else{
-            qDebug()<<"fail to connect "<<ip;
+        m_client->newConnection(ip);
+        // 列表增加一项
+        m_listBar->addContact(m_profile->m_contactProfile.last());
+        m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
+        //面板更新
+        m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
+    });
+
+    connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){
+        int index = m_listBar->messageWidget->currentRow();
+
+        MYLOG<<"compare"<<m_profile->m_contactProfile[index].ip<<" : " <<ip;
+        if(m_profile->m_contactProfile[index].ip==ip){
+            m_mainBar->addMessage(msg);
         }
     });
 
 
     // server启动
     m_server = new TcpServer;
-    qDebug()<<QNetworkInterface().allAddresses();
+    MYLOG<<QNetworkInterface().allAddresses();
     m_listBar->m_localIpLabel->setText(QNetworkInterface().allAddresses().at(2).toString()); // 存储本地ip
     m_profile->m_ip = QNetworkInterface().allAddresses().at(2).toString() + ":8000"; // 存储本地ip
+
     connect(m_listBar->portSubmitBtn, &QPushButton::clicked, [&](){
         if(m_listBar->portSubmitBtn->text()=="连接"){
             bool ok = m_server->tcpServer->listen(QHostAddress::Any, m_listBar->m_serverPortEditor->text().toInt());
             if(ok)
             {
                 m_listBar->portSubmitBtn->setText("断开");
-                qDebug()<<"server listen on"<< m_listBar->m_serverPortEditor->text();
+                MYLOG<<"server listen on"<< m_listBar->m_serverPortEditor->text();
             }
         }else{
             m_server->closeAll();
             m_listBar->portSubmitBtn->setText("连接");
-            qDebug()<<"server closed";
+            MYLOG<<"server closed";
         }
 
     });
+
+    connect(m_server, &TcpServer::addContact, [&](profile pf){
+        // 列表增加一项
+        m_listBar->addContact(pf);
+        m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
+        //面板更新
+        m_mainBar->changeBar("", pf.ip);
+    });
+
+    connect(m_server, &TcpServer::appendMsg, [=](QString ip, message msg){
+        int index = m_listBar->messageWidget->currentRow();
+
+        MYLOG<<"compare"<<m_profile->m_contactProfile[index].ip<<" : " <<ip;
+        if(m_profile->m_contactProfile[index].ip==ip){
+            m_mainBar->addMessage(msg);
+        }
+    });
+
+    MYLOG<<"server initialized!";
+
+    // 发送消息
+    connect(m_mainBar->sendBtn, &QPushButton::clicked, [&](){
+        int index = m_listBar->messageWidget->currentRow();
+        if(index>=0){
+            QString remoteIp = m_profile->m_contactProfile[index].ip;
+
+            QString editorMsg = m_mainBar->m_chatEditor->toPlainText();
+            m_mainBar->m_chatEditor->setText("");
+            QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+            MYLOG<<"addMessage" << editorMsg << time;
+            if(editorMsg != "") {
+                message msg;
+                msg.ip = m_profile->m_ip;
+                msg.msg = editorMsg;
+                msg.time = time;
+                m_mainBar->addMessage(msg);
+                m_profile->m_chatList[remoteIp].append(msg);
+                QString data = editorMsg;
+                m_client->m_tcpClient[remoteIp]->write(data.toUtf8()); // 从client连接池中找到对应ip的客户端并发送消息
+            }
+        }
+    });
+
+    MYLOG<<"all functions initialized!";
 
     // SET LAYOUT TO CENTRALWIDGET
     QWidget *mainWidget = new QWidget();
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
+
+    MYLOG<<"ui initialezed!";
 }
 
 MainWindow::~MainWindow()

@@ -1,17 +1,24 @@
 #ifndef PROFILEMANAGER_H
 #define PROFILEMANAGER_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QObject>
 #include <QMap>
 #include <QVector>
+#include <QList>
 
-struct message{
+typedef struct{
     QString msg;
     QString time;
-    QString id;
-};
+    QString ip;
+}message;
 
-using Dict = QMap<QString, QString>;
+typedef struct{
+    QString ip;
+    QString avatar=":/icons/person";
+    QString name;
+}profile;
+
 using Message = QVector<message>;
 
 class ProfileManager : public QObject
@@ -24,7 +31,8 @@ public:
     QString m_id;
     QString m_avatar=":/icons/avatar";
 
-    QVector<Dict> m_contact;
+    QList<QString> m_contact;
+    QVector<profile> m_contactProfile;
     QMap<QString,Message> m_chatList;
 
 private:

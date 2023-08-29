@@ -1,9 +1,11 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <QAbstractSocket>
 #include <QDebug>
 #include <profilemanager.h>
 
@@ -12,18 +14,14 @@ class TcpClient : public QWidget
     Q_OBJECT
 public:
     explicit TcpClient(QWidget *parent = nullptr);
+    void newConnection(QString ip);
+    void sendData(QString ip, QString msg);
     ~TcpClient();
-    QTcpSocket *tcpClient;
-    ProfileManager *profile;
+    ProfileManager *m_profile;
+    QMap<QString, QTcpSocket*> m_tcpClient;
 
-private slots:
-    //客户端槽函数
-    void ReadData();
-    void ReadError(QAbstractSocket::SocketError);
-
-//    void on_btnConnect_clicked();
-//    void on_btnSend_clicked();
-//    void on_pushButton_clicked();
+signals:
+    void appendMsg(QString ip, message msg);
 
 };
 

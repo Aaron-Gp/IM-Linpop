@@ -1,5 +1,6 @@
 #ifndef MAINBAR_H
 #define MAINBAR_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QFrame>
@@ -15,6 +16,7 @@ class QTextEdit;
 class QListWidget;
 class QListWidgetItem;
 class QSplitter;
+class QPushButton;
 
 class MainBar : public QFrame
 {
@@ -24,10 +26,11 @@ public:
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
     void changeBar(QString name, QString ip);
-    void addMessage(QMap<QString,QString> msg);
-    void addMessages(QVector<QMap<QString,QString>> msgs);
+    void addMessage(message msg);
+    void addMessages(Message msgs);
     void clearBroswer();
 
+    QPushButton *sendBtn;
 
 private:
     void setupUi();
@@ -36,7 +39,7 @@ private:
 
 signals:
 
-private:
+public:
     QFrame *m_topBar;
     QVBoxLayout *m_layout;
     QString m_avatarPath = ":/icons/avatar";

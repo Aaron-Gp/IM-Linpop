@@ -1,6 +1,8 @@
 #ifndef QNCHATMESSAGE_H
 #define QNCHATMESSAGE_H
+#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 //#define QT_NO_DEBUG_OUTPUT
+
 #include <QWidget>
 
 class QPaintEvent;
