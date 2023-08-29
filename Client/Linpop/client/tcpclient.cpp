@@ -45,7 +45,11 @@ void TcpClient::newConnection(QString ip)
             m_profile->m_contact.append(ip);
             profile newContact;
             newContact.ip = ip;
+            newContact.avatar="";
+            newContact.id="";
+            newContact.name="";
             m_profile->m_contactProfile.append(newContact);
+            emit AddFriend(tcpClient,1);
             m_profile->m_chatList.insert(ip, Message());
         }
         MYLOG<<"send hello message";
@@ -57,6 +61,17 @@ void TcpClient::newConnection(QString ip)
     connect(tcpClient, &QTcpSocket::readyRead, [=](){
         MYLOG<<"readyRead";
         QByteArray buffer = tcpClient->readAll();
+        while (buffer.contains("<?BEGIN?>")) {
+            int index_begin = buffer.indexOf("<?BEGIN?>");
+            int index_end = buffer.indexOf("<?END?>", index_begin + 1);
+            if (index_end != -1) {  // Make sure "<?END?>" is found after "<?BEGIN?>"
+                QByteArray extractedData = buffer.mid(index_begin + 9, index_end - index_begin - 9);
+                buffer.remove(index_begin, index_end - index_begin + 8);
+                emit callForAnaylzer(tcpClient, extractedData);
+            } else {
+                break;  // Break the loop if no "<?END?>" found after "<?BEGIN?>"
+            }
+        }
         MYLOG<<"buffer right?";
         QString ip = tcpClient->peerAddress().toString()+":"+QString::number(tcpClient->peerPort());
         MYLOG<<"new buffer from"<<ip;
@@ -95,4 +110,9 @@ TcpClient::~TcpClient()
         qDebug()<< "disconnect " << iter.key();
         iter.value()->abort();
     }
+}
+
+void TcpClient::callForAnaylzer(QTcpSocket *socket, QString string)
+{
+    this->analyzer->anaylze(socket,string,true);
 }

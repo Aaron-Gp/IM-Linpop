@@ -69,11 +69,32 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
         QJsonObject information=document.object();
         try{
             if(information["function"].toString()=="login"){
-                if(information["data"].toString()=="success")
-                    emit successLogin();
+                if(information["data"].toString()=="success"){
+                    emit successLogin(information["name"].toString());
+                }
                 else
                     QMessageBox::information(nullptr, "Information", information["data"].toString());
             }
+        } catch (const std::exception &e) {
+            qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
+            sendError(socket,e.what());
+        }
+    }else
+        sendError(socket,"improper json");
+}
+
+void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message,bool tag){//tag用于区分静态方法
+    QJsonDocument document=QJsonDocument::fromJson(message.toUtf8());
+    if (!document.isNull()) {
+        QJsonObject information=document.object();
+        try{
+            if(information["function"].toString()=="hello"){
+                emit returnToFriend(socket,0);
+                emit ok(information);
+            }
+            if(information["function"].toString()=="ok")
+                emit ok(information);
+
 
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
@@ -82,3 +103,5 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
     }else
         sendError(socket,"improper json");
 }
+
+

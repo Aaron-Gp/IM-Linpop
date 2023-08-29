@@ -38,6 +38,17 @@ void TcpServer::NewConnectionSlot()
     connect(currentClient, &QTcpSocket::readyRead, [=](){
         QByteArray buffer = currentClient->readAll();
         if(!buffer.isEmpty()){
+            while (buffer.contains("<?BEGIN?>")) {
+                int index_begin = buffer.indexOf("<?BEGIN?>");
+                int index_end = buffer.indexOf("<?END?>", index_begin + 1);
+                if (index_end != -1) {  // Make sure "<?END?>" is found after "<?BEGIN?>"
+                    QByteArray extractedData = buffer.mid(index_begin + 9, index_end - index_begin - 9);
+                    buffer.remove(index_begin, index_end - index_begin + 8);
+                    emit callForAnaylzer(currentClient, extractedData);
+                } else {
+                    break;  // Break the loop if no "<?END?>" found after "<?BEGIN?>"
+                }
+            }
             QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
             MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
             message msg;

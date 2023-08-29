@@ -28,6 +28,9 @@ public:
     MsgAnalyzer* analyzer;
 signals:
     void appendMsg(QString ip, message msg);
+    void AddFriend(QTcpSocket* socket,bool active);
+public slots:
+    void callForAnaylzer(QTcpSocket* socket,QString string);
 };
 
 #endif // TCPCLIENT_H

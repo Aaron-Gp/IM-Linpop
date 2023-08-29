@@ -26,8 +26,11 @@ public:
     void storeIntoDatabase(QJsonObject information);
     void sendError(QTcpSocket *socket, QString error);
     void anaylze(QTcpSocket *socket, QString message);
+    void anaylze(QTcpSocket *socket, QString message,bool tag);
 signals:
-    void successLogin();
+    void successLogin(QString name);
+    void returnToFriend(QTcpSocket* socket,bool active);
+    void ok(QJsonObject);
 public slots:
     void readMessage(QTcpSocket* socket);
 };

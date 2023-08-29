@@ -1,5 +1,7 @@
 #include "profilemanager.h"
+
 #include <QMutex>
+#include <QDebug>
 
 ProfileManager* ProfileManager::self = NULL;
 
@@ -23,6 +25,17 @@ ProfileManager *ProfileManager::getInstance()
 
     return self; //返回指针
 }
+
+void ProfileManager::update(QJsonObject json) {
+    QString targetIp = json["ip"].toString(); // 从 JSON 中获取目标 IP
+    for (int i = 0; i < m_contactProfile.size(); ++i) {
+        if (m_contactProfile[i].ip.contains(targetIp)) {
+            m_contactProfile[i].id = QString(json["id"].toInt());
+            m_contactProfile[i].name = json["name"].toString();
+        }
+    }
+}
+
 
 ProfileManager::ProfileManager(QObject *parent) : QObject(parent)
 {

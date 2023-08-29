@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QNetworkInterface>
+#include <QHostAddress>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -81,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent)
         m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
         MYLOG<<"change bar";
     });
-
     connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){
         int index = m_listBar->messageWidget->currentRow();
 
@@ -171,12 +171,40 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::successLogin);
     connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::login);
+    connect(this->m_client,&TcpClient::AddFriend,this,&MainWindow::sendToNewFriend);
+    connect(this->m_client->analyzer,&MsgAnalyzer::returnToFriend,this,&MainWindow::sendToNewFriend);
+    connect(this->m_client->analyzer,&MsgAnalyzer::ok,this->m_profile,&ProfileManager::update);
+    connect(this->m_server,&TcpServer::callForAnaylzer,this->m_client,&TcpClient::callForAnaylzer);
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
     m_server->closeAll();
+}
+
+void MainWindow::sendToNewFriend(QTcpSocket* socket,bool active){
+    QJsonObject json;
+    if(active)
+        json["function"] = "hello";
+    else
+        json["function"] = "ok";
+    json["name"]=m_name;
+    json["ip"]=QHostAddress(QHostAddress::LocalHost).toString();
+    QList<QHostAddress> ipAddressesList;
+    foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
+        foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost) {
+                ipAddressesList.append(address.ip());
+            }
+        }
+    }
+    json["ip"]=ipAddressesList.at(0).toString();
+    json["id"]=m_id;
+    QJsonDocument jsonDoc(json);
+    QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+    socket->write(jsonString.toUtf8());
 }
 
 void MainWindow::tryLogin(QString id, QString password)
@@ -188,10 +216,12 @@ void MainWindow::tryLogin(QString id, QString password)
     QJsonDocument jsonDoc(json);
     QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
     m_client->m_server->write(jsonString.toUtf8());
+    m_id=id.toInt();
 }
 
-void MainWindow::login()
+void MainWindow::login(QString name)
 {
+    m_name=name;
     this->show();
 }
 

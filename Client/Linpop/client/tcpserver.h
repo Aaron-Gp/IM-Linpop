@@ -26,7 +26,7 @@ public:
 signals:
     void appendMsg(QString ip, message msg);
     void addContact(profile pf);
-
+    void callForAnaylzer(QTcpSocket* socket,QString msg);
 
 private slots:
     void NewConnectionSlot();

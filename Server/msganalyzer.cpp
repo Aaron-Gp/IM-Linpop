@@ -91,8 +91,17 @@ void MsgAnalyzer::anaylze(){
                     for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++)
                         if (msg.socket==iter->sock)
                             iter->id=information["sender"].toInt();
-                    sendResult(msg.socket,"login","success");//在isUserAccountCorrect中已更改登录状态
-
+                    //sendResult(msg.socket,"login","success");//在isUserAccountCorrect中已更改登录状态
+                    QJsonObject json;
+                    json["function"] = "login";
+                    json["data"]="success";
+                    json["id"]=information["sender"].toInt();
+                    db.exec(QString("select name from user where id=%1").arg(information["sender"].toInt()));
+                    db.query.next();
+                    json["name"]=db.query.value("name").toString();
+                    QJsonDocument jsonDoc(json);
+                    QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+                    emit send(msg.socket,Msg(msg.socket,msg.socket->peerPort(), msg.socket->peerAddress().toString(), jsonString));
                     QList<QJsonObject> jsonList;
                     db.getMessage(information["sender"].toInt(),jsonList);
                     for (QList<QJsonObject>::iterator iter = jsonList.begin(); iter != jsonList.end(); iter++){

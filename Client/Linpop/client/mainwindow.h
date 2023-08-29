@@ -40,7 +40,8 @@ public:
     void makeFakeData();
 public slots:
     void tryLogin(QString id,QString password);
-    void login();
+    void login(QString name);
+    void sendToNewFriend(QTcpSocket* socket,bool active);
 signals:
     void successLogin();
     void switched(int index);
@@ -57,6 +58,9 @@ private:
     ProfileManager *m_profile;
     TcpServer *m_server;
     TcpClient *m_client;
-
+    int m_id;
+    QString m_ip;
+    QString m_name;
 };
+
 #endif // MAINWINDOW_H

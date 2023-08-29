@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QVector>
 #include <QList>
+#include <QJsonObject>
 
 typedef struct{
     QString msg;
@@ -37,7 +38,8 @@ public:
     QList<QString> m_contact;
     QVector<profile> m_contactProfile;
     QMap<QString,Message> m_chatList;
-
+public slots:
+    void update(QJsonObject json);
 private:
     ProfileManager(QObject *parent = nullptr);
     static ProfileManager *self;
