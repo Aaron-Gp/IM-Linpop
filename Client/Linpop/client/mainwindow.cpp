@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 m_listBar->portSubmitBtn->setText("断开");
                 MYLOG<<"server listen on"<< m_listBar->m_serverPortEditor->text();
+                m_profile->useServer=true;
             }
         }else{
             m_server->closeAll();
@@ -152,7 +153,10 @@ MainWindow::MainWindow(QWidget *parent)
                 m_mainBar->addMessage(msg);
                 m_profile->m_chatList[remoteIp].append(msg);
                 QString data = editorMsg;
-                m_client->m_tcpClient[remoteIp]->write(data.toUtf8()); // 从client连接池中找到对应ip的客户端并发送消息
+                if(m_profile->useServer) // 使用服务端发送
+                    m_server->m_tcpClient[remoteIp]->write(data.toUtf8());
+                else // 使用客户端发送
+                    m_client->m_tcpClient[remoteIp]->write(data.toUtf8()); // 从client连接池中找到对应ip的客户端并发送消息
             }
         }
     });

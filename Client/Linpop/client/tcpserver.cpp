@@ -35,7 +35,7 @@ void TcpServer::NewConnectionSlot()
     QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
     MYLOG<<"new connection from "<<ip;
 
-    connect(currentClient, &QTcpSocket::readyRead, [&](){
+    connect(currentClient, &QTcpSocket::readyRead, [=](){
         QByteArray buffer = currentClient->readAll();
         if(!buffer.isEmpty()){
             QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());

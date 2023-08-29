@@ -30,6 +30,7 @@ public:
     QString m_name;
     QString m_id;
     QString m_avatar=":/icons/avatar";
+    bool useServer = false;
 
     QList<QString> m_contact;
     QVector<profile> m_contactProfile;
