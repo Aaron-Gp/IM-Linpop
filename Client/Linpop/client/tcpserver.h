@@ -1,6 +1,5 @@
 #ifndef TCPSERVER_H
 #define TCPSERVER_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QTcpServer>
@@ -9,6 +8,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <profilemanager.h>
+#include <global.h>
 
 class TcpServer : public QWidget
 {

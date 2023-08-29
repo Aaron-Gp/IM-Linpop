@@ -9,7 +9,6 @@
 #include <QToolButton>
 #include <QTextEdit>
 #include <QDateTime>
-#include <QDebug>
 
 MainBar::MainBar(QWidget *parent) : QFrame(parent)
 {

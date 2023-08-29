@@ -1,6 +1,6 @@
 QT += core gui widgets network sql
 TEMPLATE = app
-CONFIG += c++11
+CONFIG += c++14
 SOURCES = main.cpp \
     cabstractemojitable.cpp \
     emojitab.cpp \
@@ -16,6 +16,7 @@ SOURCES = main.cpp \
 HEADERS = mainwindow.h \
     cabstractemojitable.h \
     emojitab.h \
+    global.h \
     listbar.h \
     login.h \
     mainbar.h \

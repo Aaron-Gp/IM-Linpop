@@ -1,6 +1,5 @@
 #ifndef LISTBAR_H
 #define LISTBAR_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QObject>
 #include <QWidget>
@@ -8,8 +7,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include <QDebug>
 #include <profilemanager.h>
+#include "global.h"
 
 class QVBoxLayout;
 class QStackedLayout;

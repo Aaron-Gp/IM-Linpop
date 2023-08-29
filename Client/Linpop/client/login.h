@@ -7,6 +7,8 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QSettings>
+#include <profilemanager.h>
+#include "global.h"
 
 namespace Ui { class login; }
 
@@ -31,8 +33,8 @@ public slots:
     void loginWindowClose();
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+//    void mousePressEvent(QMouseEvent *event);
+//    void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
     void on_pushButton_clicked();

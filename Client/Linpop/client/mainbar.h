@@ -1,6 +1,5 @@
 #ifndef MAINBAR_H
 #define MAINBAR_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QFrame>
@@ -10,6 +9,7 @@
 #include <QMap>
 #include <QVector>
 #include <profilemanager.h>
+#include "global.h"
 
 class QVBoxLayout;
 class QTextEdit;

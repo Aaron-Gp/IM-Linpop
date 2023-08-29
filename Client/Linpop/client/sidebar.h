@@ -1,9 +1,9 @@
 #ifndef LEFTBAR_H
 #define LEFTBAR_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QFrame>
+#include "global.h"
 
 class QVBoxLayout;
 class QtMaterialAvatar;

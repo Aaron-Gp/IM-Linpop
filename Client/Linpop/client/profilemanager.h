@@ -1,11 +1,12 @@
 #ifndef PROFILEMANAGER_H
 #define PROFILEMANAGER_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QObject>
 #include <QMap>
 #include <QVector>
 #include <QList>
+#include <QTcpSocket>
+#include "global.h"
 
 typedef struct{
     QString msg;
@@ -35,6 +36,7 @@ public:
     QList<QString> m_contact;
     QVector<profile> m_contactProfile;
     QMap<QString,Message> m_chatList;
+    QTcpSocket *m_clientToServer;
 
 private:
     ProfileManager(QObject *parent = nullptr);

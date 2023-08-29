@@ -1,7 +1,5 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
-//#define QT_NO_DEBUG_OUTPUT
 
 #include <QMainWindow>
 #include <QJsonArray>
@@ -12,8 +10,9 @@
 #include <listbar.h>
 #include <mainbar.h>
 #include <profilemanager.h>
-#include <tcpserver.h>
-#include <tcpclient.h>
+#include "tcpserver.h"
+#include "tcpclient.h"
+#include "global.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

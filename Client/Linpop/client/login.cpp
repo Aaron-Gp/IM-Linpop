@@ -35,26 +35,6 @@ void login::loginWindowClose()
     this->close();
 }
 
-//鼠标按下
-void login::mousePressEvent(QMouseEvent *event)
-{
-   if(event->button() == Qt::LeftButton)
-   {
-       m_point = event->globalPos() - pos(); //计算移动量
-       event->accept();
-   }
-}
-
-//鼠标移动
-void login::mouseMoveEvent(QMouseEvent *event)
-{
-    if(event->buttons() & Qt::LeftButton)
-    {
-        move(event->globalPos() - m_point);
-        event->accept();
-    }
-}
-
 void login::on_pushButton_clicked()
 {
     this->showMinimized();

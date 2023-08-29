@@ -1,13 +1,12 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
-#define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 
 #include <QWidget>
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QAbstractSocket>
-#include <QDebug>
 #include <profilemanager.h>
+#include "global.h"
 
 class TcpClient : public QWidget
 {
