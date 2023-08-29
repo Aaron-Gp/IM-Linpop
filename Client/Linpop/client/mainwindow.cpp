@@ -74,11 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_listBar->addContactBtn, &QToolButton::clicked, [&](){
         QString ip = m_listBar->searchBar->text();
         bool success = m_client->newConnection(ip);
-        if(success){
+        MYLOG<<"success"<<success<<"contains? "<<ip;
+        if(success && !m_profile->m_contact.contains(ip)){
+            m_profile->m_contact.append(ip);
             // 列表增加一项
             m_listBar->addContact(m_profile->m_contactProfile.last());
             m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
-            MYLOG<<"add contact";
+            MYLOG<<"add contact bar to "<<m_listBar->messageWidget->count()-1;
             //面板更新
             m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
             MYLOG<<"change bar";
@@ -87,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){
         int index = m_listBar->messageWidget->currentRow();
-
+        MYLOG<<"current row"<<index;
         MYLOG<<"compare"<<m_profile->m_contactProfile[index].ip<<" : " <<ip;
         if(m_profile->m_contactProfile[index].ip==ip){
             m_mainBar->addMessage(msg);
@@ -177,6 +179,12 @@ MainWindow::~MainWindow()
 {
     delete ui;
     m_server->closeAll();
+}
+
+void MainWindow::rcvLogin()
+{
+    this->show();
+    emit closeLoginWindow();
 }
 
 

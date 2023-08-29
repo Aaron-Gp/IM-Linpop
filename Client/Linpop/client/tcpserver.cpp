@@ -15,17 +15,20 @@ TcpServer::~TcpServer()
 
 void TcpServer::closeAll()
 {
-    for(auto iter=m_tcpClient.begin(); iter!=m_tcpClient.end(); ++iter)//断开所有连接
+    QMapIterator<QString, QTcpSocket*>it(m_tcpClient);
+    while (it.hasNext())
     {
-        QTcpSocket *tcpClien = iter.value();
-        tcpClien->disconnectFromHost();
-        bool ok = tcpClien->waitForDisconnected(1000);
+        it.next();
+        QTcpSocket *tcpClient = it.value();
+        bool ok = tcpClient->waitForDisconnected(1000);
         if(!ok)
         {
-            // 处理异常
+            MYLOG<<"closed error";
+            tcpClient->abort();
         }
-        m_tcpClient.remove(iter.key());  //从保存的客户端列表中取去除
+        m_tcpClient.remove(it.key());
     }
+    m_tcpClient.clear();
     tcpServer->close();     //不再监听端口
 }
 
@@ -48,12 +51,14 @@ void TcpServer::NewConnectionSlot()
         }
     });
 
-    connect(currentClient, &QTcpSocket::disconnected, [&](){
+    connect(currentClient, &QTcpSocket::disconnected, [=](){
+        MYLOG<<"client diconnected";
         if(currentClient->state() == QAbstractSocket::UnconnectedState)
         {
             // 删除存储在tcpClient列表中的客户端信息
             QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+QString::number(currentClient->peerPort());
             currentClient->destroyed();
+            MYLOG<<"destroy "<<ip;
             m_tcpClient.remove(ip);
         }
     });

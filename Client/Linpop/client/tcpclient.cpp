@@ -12,7 +12,8 @@ bool TcpClient::newConnection(QString ip)
 {
     //初始化TCP客户端
     QTcpSocket *tcpClient = new QTcpSocket();   //实例化tcpClient
-    tcpClient->connectToHost(ip, 8000);
+
+    tcpClient->connectToHost(ip.split(":")[0],ip.split(":")[1].toInt());
     bool ok = tcpClient->waitForConnected(1000);
     if (ok)
     {
@@ -22,7 +23,7 @@ bool TcpClient::newConnection(QString ip)
         bool exist = m_profile->m_contact.contains(ip);
         if(!exist){
             MYLOG<<"new contact "+ip;
-            m_profile->m_contact.append(ip);
+//            m_profile->m_contact.append(ip);
             profile newContact;
             newContact.ip = ip;
             m_profile->m_contactProfile.append(newContact);
@@ -54,8 +55,10 @@ bool TcpClient::newConnection(QString ip)
             emit appendMsg(ip, msg); // 发送信号
         }
     });
-    connect(tcpClient, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), [&](){
+    connect(tcpClient, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), [=](){
         tcpClient->disconnectFromHost();
+        QString ip = tcpClient->peerAddress().toString()+":"+QString::number(tcpClient->peerPort());
+        m_tcpClient.remove(ip);
         QMessageBox msgBox;
         msgBox.setText(tr("failed to connect server because %1").arg(tcpClient->errorString()));
         msgBox.exec();
@@ -74,5 +77,6 @@ TcpClient::~TcpClient()
     {
         qDebug()<< "disconnect " << iter.key();
         iter.value()->abort();
+        m_tcpClient.remove(iter.key());
     }
 }

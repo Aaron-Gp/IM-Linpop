@@ -3,7 +3,9 @@ TEMPLATE = app
 CONFIG += c++11
 SOURCES = main.cpp \
     cabstractemojitable.cpp \
+    emojitab.cpp \
     listbar.cpp \
+    login.cpp \
     mainbar.cpp \
     mainwindow.cpp \
     profilemanager.cpp \
@@ -13,7 +15,9 @@ SOURCES = main.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
     cabstractemojitable.h \
+    emojitab.h \
     listbar.h \
+    login.h \
     mainbar.h \
     profilemanager.h \
     qnchatmessage.h \
@@ -27,6 +31,7 @@ TARGET = client-exe
 PRE_TARGETDEPS += $$top_builddir/components/$(OBJECTS_DIR)/libcomponents.a
 
 FORMS += \
+    login.ui \
     mainwindow.ui
 
 RESOURCES += \

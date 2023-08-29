@@ -40,6 +40,9 @@ public:
 
 signals:
     void switched(int index);
+    void closeLoginWindow();
+public slots:
+    void rcvLogin();
 
 private:
     Ui::MainWindow *ui;
