@@ -63,11 +63,11 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // 聊天面板切换
-    connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
-        QString name = m_profile->m_contactProfile.at(row).name;
-        QString ip = m_profile->m_contactProfile.at(row).ip;
-        m_mainBar->changeBar(name, ip);
-    });
+//    connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
+//        QString name = m_profile->m_contactProfile.at(row).name;
+//        QString ip = m_profile->m_contactProfile.at(row).ip;
+//        m_mainBar->changeBar(name, ip);
+//    });
 
     // client连接
     m_client = new TcpClient;
@@ -77,8 +77,10 @@ MainWindow::MainWindow(QWidget *parent)
         // 列表增加一项
         m_listBar->addContact(m_profile->m_contactProfile.last());
         m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
+        MYLOG<<"add contact";
         //面板更新
         m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
+        MYLOG<<"change bar";
     });
 
     connect(m_client, &TcpClient::appendMsg, [=](QString ip, message msg){
@@ -162,7 +164,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 
-    MYLOG<<"ui initialezed!";
+    MYLOG<<"ui initialezed completed!";
 }
 
 MainWindow::~MainWindow()

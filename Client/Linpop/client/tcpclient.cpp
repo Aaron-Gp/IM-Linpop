@@ -1,6 +1,7 @@
 #include "tcpclient.h"
 #include <QMessageBox>
 #include <QDateTime>
+#include <QThread>
 
 TcpClient::TcpClient(QWidget *parent) : QWidget(parent)
 {
@@ -27,15 +28,19 @@ void TcpClient::newConnection(QString ip)
             m_profile->m_contactProfile.append(newContact);
             m_profile->m_chatList.insert(ip, Message());
         }
+        MYLOG<<"send hello message";
 
         QString data = "hello from client!";
         tcpClient->write(data.toUtf8());
     }else{
         MYLOG<<"fail to connect "<<ip;
     }
-    connect(tcpClient, &QTcpSocket::readyRead, [&](){
+    connect(tcpClient, &QTcpSocket::readyRead, [=](){
+        MYLOG<<"readyRead";
         QByteArray buffer = tcpClient->readAll();
+        MYLOG<<"buffer right?";
         QString ip = tcpClient->peerAddress().toString()+":"+QString::number(tcpClient->peerPort());
+        MYLOG<<"new buffer from"<<ip;
         if(!buffer.isEmpty())
         {
             MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
