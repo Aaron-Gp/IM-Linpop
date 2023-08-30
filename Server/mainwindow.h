@@ -25,6 +25,7 @@ public slots:
     void slotSwitchToPage(int i);
     void slotDeleteFromDataBase();
     void slotSearch();
+    void addNewUser();
 private:
     void deleteFromDataBase();
     static void switchToPage(int);

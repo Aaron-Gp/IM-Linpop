@@ -30,7 +30,7 @@ public:
     int isUserAccountCorrect(int id, QString password,QString ip);
     void setUserAccountOffline(int id);
     static QString generateRandomPassword(int length);
-    QJsonObject addUserAccount(int id, QString name, int department);
+    QJsonObject addUserAccount(int id, QString name, QString department);
     QString alterUserPassword(int id, QString passwordOld, QString passwordNew);
     QString alterUserName(int id, QString name);
     void deleteUserAccount(int id);

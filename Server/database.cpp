@@ -119,7 +119,7 @@ QString DataBase::generateRandomPassword(int length) {
 }
 
 
-QJsonObject DataBase::addUserAccount(int id, QString name, int department) {
+QJsonObject DataBase::addUserAccount(int id, QString name, QString department) {
     query.prepare("SELECT * FROM user WHERE id = ?");
     query.addBindValue(id);
     if (!query.exec())
@@ -127,10 +127,16 @@ QJsonObject DataBase::addUserAccount(int id, QString name, int department) {
     if (query.next())
         throw std::runtime_error("Database error: id exists");
     else {
-        query.prepare("INSERT INTO user (id, name, department, password) VALUES (?, ?, ?, ?)");
+        query.prepare("SELECT ID FROM DEPARTMENT WHERE NAME=?");
+        query.addBindValue(department);
+        if(!query.exec())
+            throw std::runtime_error("Database error: " + query.lastError().text().toStdString());
+        query.next();
+        int department_id=query.value("ID").toInt();
+        query.prepare("INSERT INTO user (id, name, department, password,online) VALUES (?, ?, ?, ?,false)");
         query.addBindValue(id);
         query.addBindValue(name);
-        query.addBindValue(department);
+        query.addBindValue(department_id);
         // Generate and set password here
         QString password = generateRandomPassword(20); // Make sure to implement this method
         query.addBindValue(password);

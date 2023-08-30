@@ -26,8 +26,11 @@ MainWindow::MainWindow(QWidget *parent)
     //db->ShowInTable(ui->tableView,"SELECT * FROM USER");
     db->ShowInTable(ui->tableView, "SELECT user.id AS 工号, user.name AS 姓名, department.name AS 部门 FROM user, department WHERE user.department = department.id");
     db->ShowInComboBox(ui->comboBox,"SELECT NAME FROM DEPARTMENT");
+    db->ShowInComboBox(ui->comboBox_2,"SELECT NAME FROM DEPARTMENT");
     connect(ui->pushButton_2,&QPushButton::clicked, this, &MainWindow::slotSearch);
+    connect(ui->pushButton_3,&QPushButton::clicked, this, &MainWindow::addNewUser);
     server = new TcpServer(this);
+
 }
 
 MainWindow::~MainWindow(){
@@ -74,4 +77,25 @@ void MainWindow::deleteFromDataBase(){
         }
     }else
         QMessageBox::information(this, "Message", "No row selected.");
+}
+
+void MainWindow::addNewUser(){
+    QString name=ui->lineEdit_3->text();
+    QString id=ui->lineEdit_4->text();
+    QString department=ui->comboBox_2->currentText();
+    qDebug()<<name<<id<<department;
+    try{
+        if(department=="")
+            throw std::runtime_error("dapartment is not chosen");
+        if(id=="")
+            throw std::runtime_error("id is blank");
+        if(!id.toInt())
+            throw std::runtime_error("id can contain only number");
+        if(name=="")
+            throw std::runtime_error("name is blank");
+        QJsonObject json=db->addUserAccount(id.toInt(),name,department);
+        QMessageBox::information(this,"message","ID:"+id+"\n"+"name:"+name+"\n"+"department:"+department+"\n"+"password:"+json["password"].toString());
+    }catch(std::runtime_error e){
+        QMessageBox::critical(this,"message",e.what());
+    }
 }
