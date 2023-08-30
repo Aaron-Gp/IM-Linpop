@@ -103,6 +103,31 @@ void MainBar::setupMainBar()
     emojiBtn->setIcon(QIcon(":/icons/emoji"));
     emojiBtn->setIconSize(QSize(32,32));
 
+    connect(emojiBtn, &QToolButton::clicked,[=](){
+        MYLOG<<"emoji";
+        bar = new EmojiBar(emojiBtn);
+        bar->showEmoji(emojiBtn);
+        const QPoint buttonPos = emojiBtn->mapToGlobal(QPoint(0, 0));
+        bar->tableWidget->move(buttonPos.x(), buttonPos.y() - bar->tableWidget->height());
+
+        connect(bar->tableWidget, &QTableWidget::itemClicked, [&](){
+            // 获取当前选中的行和列
+            int row = bar->tableWidget->currentRow();
+            int column = bar->tableWidget->currentColumn();
+            // 获取选中项的数据
+            QTableWidgetItem *item = bar->tableWidget->item(row,column);
+            MYLOG << item;
+            if (item) {
+                // 使用QTableWidgetItem的方法获取数据
+                QString data = item->text();
+                m_chatEditor->insertPlainText(data);
+                // 在这里处理数据...
+                MYLOG << data;
+                bar->tableWidget->close();
+            }
+        });
+    });
+
     toolCLayout->addWidget(emojiBtn);
 
     imageBtn = new QToolButton;

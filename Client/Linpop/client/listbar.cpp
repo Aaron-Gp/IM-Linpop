@@ -34,7 +34,7 @@ void ListBar::addContact(profile pf)
     QLabel *avatar = new QLabel;
     avatar->setStyleSheet("QLabel{"
                           "border-radius:30px;"
-                          "border-image:url(data:image/png;base64,"+pf.avatar+");"
+                          "border-image:url(data:image/png;base64,"+QByteArray::fromBase64( pf.avatar.toUtf8())+");"
                           "}");
     avatar->setFixedSize(60,60);
     messageItemLayout->addWidget(avatar);
@@ -50,6 +50,7 @@ void ListBar::addContact(profile pf)
     QListWidgetItem *messageItem = new QListWidgetItem;
 
     messageItem->setSizeHint(QSize(messageWidget->width(),90));
+    messageItem->setData(Qt::UserRole, pf.id);
     messageWidget->addItem(messageItem);
     messageWidget->setItemWidget(messageItem, messageItemFrame);
 
@@ -70,7 +71,7 @@ void ListBar::addContact(profile pf)
 
     QVBoxLayout *rightCILayout = new QVBoxLayout;
     rightCILayout->setContentsMargins(0,0,0,0);
-    msg = new QLabel(pf.name+"("+pf.ip+")");
+    msg = new QLabel(pf.id+"("+pf.ip+")");
     rightCILayout->addWidget(msg);
 
     contactItemLayout->addLayout(rightCILayout);
@@ -78,6 +79,7 @@ void ListBar::addContact(profile pf)
 
     QListWidgetItem *contactItem = new QListWidgetItem;
     contactItem->setSizeHint(QSize(personList->width()-2,90));
+    contactItem->setData(Qt::UserRole, pf.id);
     personList->addItem(contactItem);
     personList->setItemWidget(contactItem, contactItemFrame);
 }

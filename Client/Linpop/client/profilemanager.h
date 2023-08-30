@@ -56,6 +56,7 @@ private:
 signals:
     void addContact();
     void appendMsg(QString id, message msg);
+    void updateListBar();
 
 };
 

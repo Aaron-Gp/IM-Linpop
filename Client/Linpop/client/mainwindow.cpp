@@ -38,8 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
     resize(1210,760);
     setFixedSize(1210,760);
     setWindowTitle("Linpop");
-
-
 }
 
 MainWindow::~MainWindow()
@@ -85,28 +83,7 @@ void MainWindow::setUpUi()
     connect(m_listBar->addContactBtn, &QToolButton::clicked, [&](){
         QString ip = m_listBar->searchBar->text();
         bool success = m_client->newConnection(ip);
-        MYLOG<<"success"<<success<<"contains? "<<ip;
-        /*if(success && !m_profile->m_contact.contains(ip)){
-            m_profile->m_contact.append(ip);
-            // 列表增加一项
-            m_listBar->addContact(m_profile->m_contactProfile.last());
-            m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
-            MYLOG<<"add contact bar to "<<m_listBar->messageWidget->count()-1;
-            //面板更新
-//            m_mainBar->changeBar("", m_profile->m_contactProfile.last().ip);
-//            MYLOG<<"change bar";
-        }*/
-    });
-
-    connect(m_client, &TcpClient::appendMsg, [=](QString id, message msg){
-        int index = m_listBar->messageWidget->currentRow();
-        QString c_id = m_profile->m_contact[index];
-        m_profile->m_chatList[c_id].append(msg);
-        MYLOG<<"current row"<<index;
-        MYLOG<<"compare"<<c_id<<" : " <<id;
-        if(c_id==id){
-            m_mainBar->addMessage(msg);
-        }
+        if(success) MYLOG<<"success conect to "<<ip;
     });
 
     MYLOG<<"client initialized!";
@@ -132,24 +109,18 @@ void MainWindow::setUpUi()
             m_listBar->portSubmitBtn->setText("连接");
             MYLOG<<"server closed";
         }
-
     });
 
-    /*connect(m_server, &TcpServer::addContact, [&](profile pf){
-        // 列表增加一项
-        m_listBar->addContact(pf);
-        m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
-        //面板更新
-//        m_mainBar->changeBar("", pf.ip);
-    });*/
-
     connect(m_profile, &ProfileManager::appendMsg, [=](QString id, message msg){
-        int index = m_listBar->messageWidget->currentRow();
-        QString c_id = m_profile->m_contact[index];
-        m_profile->m_chatList[c_id].append(msg);
-        MYLOG<<"compare"<<c_id<<" : " <<id;
-        if(c_id==id){
-            m_mainBar->addMessage(msg);
+        QListWidgetItem *item = m_listBar->messageWidget->currentItem();
+        if(item!=nullptr){
+            QString c_id = item->data(Qt::UserRole).toString();
+            m_profile->m_chatList[c_id].append(msg);
+            MYLOG<<"compare "<<c_id<<" : " <<id;
+            if(c_id==id){
+                m_mainBar->addMessage(msg);
+                MYLOG<<"add msg to main bar";
+            }
         }
     });
 
@@ -159,14 +130,21 @@ void MainWindow::setUpUi()
     // 添加联系人
 
     connect(m_profile, &ProfileManager::addContact, [=](){
+        m_listBar->addContact(m_profile->m_contactProfile[m_profile->m_contact.last()]);
+        int cnt = m_listBar->messageWidget->count();
+        MYLOG<< cnt;
+        m_listBar->messageWidget->setCurrentRow(cnt-1);
+    });
+
+    connect(m_profile, &ProfileManager::updateListBar, [=](){
         m_listBar->updateContactList();
     });
 
     // 发送消息
     connect(m_mainBar->sendBtn, &QPushButton::clicked, [&](){
-        int index = m_listBar->messageWidget->currentRow();
-        if(index>=0){
-            QString id = m_profile->m_contact[index];
+        QListWidgetItem *item = m_listBar->messageWidget->currentItem();
+        if(item!=nullptr){
+            QString id = item->data(Qt::UserRole).toString();
             QString remoteIp = m_profile->m_contactProfile[id].ip;
 
             QString editorMsg = m_mainBar->m_chatEditor->toPlainText();
@@ -190,7 +168,6 @@ void MainWindow::setUpUi()
             }
         }
     });
-
 
     // 更换头像
 

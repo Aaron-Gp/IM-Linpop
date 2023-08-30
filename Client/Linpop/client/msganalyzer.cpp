@@ -130,6 +130,7 @@ void MsgAnalyzer::sendMessage(QTcpSocket *socket, QString function, message *msg
     QJsonDocument json;
     json.setObject(obj);
     QByteArray byteArray = json.toJson(QJsonDocument::Compact);
+    MYLOG<<byteArray;
     socket->write(byteArray);
 }
 
@@ -164,20 +165,26 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
         QString value = obj.value("function").toString();
         if(value == "init"){ // 初始化
             if(!m_profile->m_contact.contains(id)){ // 新联系人
-                m_profile->m_contact.append(id);
+
                 m_profile->m_contactProfile.insert(id, profile());
                 m_profile->m_chatList.insert(id,Message());
             }
 
+            m_profile->m_contactProfile[id].id = id;
             m_profile->m_contactProfile[id].ip = ip;
             QByteArray avatar = obj.value("avatar").toVariant().toByteArray();
             QByteArray ba2 = avatar.toBase64();
             QString b64str = QString::fromUtf8(ba2);
             m_profile->m_contactProfile[id].avatar = b64str;
-            emit m_profile->addContact();
-            MYLOG<<b64str.mid(0,100);
-
+            MYLOG<<b64str;
+            if(!m_profile->m_contact.contains(id)){
+                m_profile->m_contact.append(id); // 到这里才能添加
+                emit m_profile->addContact();
+            }else{
+                emit m_profile->updateListBar();
+            }
         }else if (value == "message"){
+            MYLOG<<"receive message from id "<<id;
             message msg;
             msg.id = id;
             msg.msg = obj.value("msg").toString();

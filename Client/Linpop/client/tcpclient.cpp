@@ -21,12 +21,7 @@ bool TcpClient::newConnection(QString ip)
         QString ip = tcpClient->peerAddress().toString()+":"+QString::number(tcpClient->peerPort());
         MYLOG<<"connect to "+ip;
         m_tcpClient.insert(ip, tcpClient); // 将新的连接加入连接池中
-        /*bool exist = m_profile->m_contact.contains(ip);
-        if(!exist){
-            MYLOG<<"new contact "+ip;
-//            m_profile->m_contact.append(ip);
-        }*/
-        MYLOG<<"send hello message";
+        MYLOG<<"send init message";
         m_analyzer->sendMessage(tcpClient,"init",nullptr);
 
     }else{
@@ -35,9 +30,7 @@ bool TcpClient::newConnection(QString ip)
     }
 
     connect(tcpClient, &QTcpSocket::readyRead, [=](){
-        MYLOG<<"readyRead";
         QByteArray buffer = tcpClient->readAll();
-        MYLOG<<"buffer right?";
         QString ip = tcpClient->peerAddress().toString()+":"+QString::number(tcpClient->peerPort());
         MYLOG<<"new buffer from"<<ip;
         if(!buffer.isEmpty())

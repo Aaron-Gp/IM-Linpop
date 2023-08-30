@@ -1,4 +1,4 @@
-#include "ChangeHeaderWnd.h"
+#include "changeheaderwnd.h"
 #include <QFileDialog>
 #include <QPainter>
 

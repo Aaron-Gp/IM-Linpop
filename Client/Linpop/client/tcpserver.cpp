@@ -43,13 +43,6 @@ void TcpServer::NewConnectionSlot()
         QByteArray buffer = currentClient->readAll();
         if(!buffer.isEmpty()){
             m_analyzer->receiveMessage(currentClient, buffer, true);
-//            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
-//            MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
-//            message msg;
-//            msg.msg = QString::fromUtf8(buffer);
-//            msg.ip=ip;
-//            msg.time=QString::number(QDateTime::currentDateTime().toTime_t());
-//            emit appendMsg(ip, msg);
         }
     });
 
@@ -66,8 +59,6 @@ void TcpServer::NewConnectionSlot()
     });
 
     m_tcpClient.insert(ip,currentClient);
-
     // 打招呼
-//    QString data = "Hello, you can chat to "+m_profile->m_ip+" now!";
     m_analyzer->sendMessage(currentClient, "init", nullptr);
 }

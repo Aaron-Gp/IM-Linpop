@@ -27,18 +27,10 @@ public:
     MsgAnalyzer *m_analyzer;
 
 signals:
-    void appendMsg(QString ip, message msg);
-    void addContact(profile pf);
-
 
 private slots:
     void NewConnectionSlot();
-//    void disconnectedSlot();
-//    void ReadData();
 
-//    void on_btnConnect_clicked();
-//    void on_btnSend_clicked();
-//    void on_btnClear_clicked();
 
 };
 

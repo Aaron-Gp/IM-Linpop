@@ -10,6 +10,7 @@
 #include <QVector>
 #include <profilemanager.h>
 #include "global.h"
+#include "emojibar.h"
 
 class QVBoxLayout;
 class QTextEdit;
@@ -31,6 +32,7 @@ public:
     void addMessages(Message msgs);
     void clearBroswer();
 
+    EmojiBar *bar;
     QPushButton *sendBtn;
     QFrame *historyFrame, *toolCFrame, *chatFrame, *chatCFrame, *sendCFrame;
     QToolButton *emojiBtn, *imageBtn, *fileBtn;

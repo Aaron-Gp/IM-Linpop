@@ -1,4 +1,4 @@
-#include "DragScrollArea.h"
+#include "dragscrollarea.h"
 #include <QEvent>
 #include <QMouseEvent>
 #include <QScrollBar>

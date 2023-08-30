@@ -7,6 +7,7 @@ SOURCES = main.cpp \
     clientdatabase.cpp \
     clienttoserver.cpp \
     dragscrollarea.cpp \
+    emojibar.cpp \
     emojitab.cpp \
     filetransfer.cpp \
     listbar.cpp \
@@ -25,6 +26,7 @@ HEADERS = mainwindow.h \
     clientdatabase.h \
     clienttoserver.h \
     dragscrollarea.h \
+    emojibar.h \
     emojitab.h \
     filetransfer.h \
     global.h \
@@ -44,7 +46,7 @@ TARGET = client-exe
 PRE_TARGETDEPS += $$top_builddir/components/$(OBJECTS_DIR)/libcomponents.a
 
 FORMS += \
-    ChangeHeaderWnd.ui \
+    changeheaderwnd.ui \
     login.ui \
     mainwindow.ui
 

@@ -23,7 +23,7 @@ public:
     MsgAnalyzer *m_analyzer;
 
 signals:
-    void appendMsg(QString ip, message msg);
+
 
 };
 

@@ -45,20 +45,20 @@ QPushButton#pushButton_close
 QPushButton#pushButton_anti
 {
 	border:none;
-	background-image:url(:/QRC/UI/Image/rotate_anti_normal.png);
+	background-image:url(:/assets/UI/Image/rotate_anti_normal.png);
 }
 QPushButton#pushButton_anti:hover
 {
-	background-image:url(:/QRC/UI/Image/rotate_anti_hover.png);
+	background-image:url(:/assets/UI/Image/rotate_anti_hover.png);
 }
 QPushButton#pushButton_clock
 {
 	border:none;
-	background-image:url(:/QRC/UI/Image/rotate_clock_normal.png);
+	background-image:url(:/assets/UI/Image/rotate_clock_normal.png);
 }
 QPushButton#pushButton_clock:hover
 {
-	background-image:url(:/QRC/UI/Image/rotate_clock_hover.png);
+	background-image:url(:/assets/UI/Image/rotate_clock_hover.png);
 }
 QPushButton#pushButton_ok
 {
@@ -139,7 +139,7 @@ QPushButton#pushButton_ok
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/QRC/UI/Image/close.png</normaloff>:/QRC/UI/Image/close.png</iconset>
+          <normaloff>:/assets/UI/Image/close.png</normaloff>:/assets/UI/Image/close.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -374,7 +374,7 @@ QPushButton#pushButton_ok
   <customwidget>
    <class>DragScrollArea</class>
    <extends>QScrollArea</extends>
-   <header location="global">UI/DragScrollArea.h</header>
+   <header location="global">dragscrollarea.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
