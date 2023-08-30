@@ -13,7 +13,7 @@
 #include <QMessageBox>
 #include <QElapsedTimer>
 
-#include "Definition.h"
+#include "global.h"
 #include "clientdatabase.h"
 
 class TcpServer;
@@ -23,11 +23,11 @@ class MsgAnalyzer:public QObject{
 public:
     explicit MsgAnalyzer(ClientDataBase* db);
     ClientDataBase* db;
-    void storeIntoDatabase(QJsonObject information);
     void sendError(QTcpSocket *socket, QString error);
     void anaylze(QTcpSocket *socket, QString message);
     void anaylze(QTcpSocket *socket, QString message,bool tag);
 signals:
+    void storeIntoDatabase(QJsonObject information);
     void successLogin(QString name);
     void returnToFriend(QTcpSocket* socket,bool active);
     void ok(QJsonObject);

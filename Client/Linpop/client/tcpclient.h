@@ -8,7 +8,7 @@
 #include <QAbstractSocket>
 #include <QDebug>
 #include <profilemanager.h>
-#include "Definition.h"
+#include "global.h"
 #include "msganalyzer.h"
 #include "clientdatabase.h"
 

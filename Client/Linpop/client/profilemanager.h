@@ -13,6 +13,8 @@ typedef struct{
     QString time;
     QString ip;
     QString id;
+    QString receiver;
+    bool active;//true means you send the message
 }message;
 
 typedef struct{
@@ -33,7 +35,7 @@ public:
     QString m_name;
     QString m_id;
     QString m_avatar=":/icons/avatar";
-    bool useServer = false;
+    bool useServer = true;
 
     QList<QString> m_contact;
     QVector<profile> m_contactProfile;

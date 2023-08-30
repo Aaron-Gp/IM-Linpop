@@ -3,6 +3,7 @@ TEMPLATE = app
 CONFIG += c++11
 SOURCES = main.cpp \
     clientdatabase.cpp \
+    clienttoserver.cpp \
     listbar.cpp \
     login.cpp \
     mainbar.cpp \
@@ -14,8 +15,9 @@ SOURCES = main.cpp \
     tcpclient.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
-    Definition.h \
     clientdatabase.h \
+    clienttoserver.h \
+    global.h \
     listbar.h \
     login.h \
     mainbar.h \

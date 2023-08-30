@@ -3,6 +3,7 @@
 
 #define SERVER "127.0.0.1"
 #define PORT 6666
-#define PATH "../DB/DB"
+#define DATABASE "../"
+#define DATABASENAME "data.db"
 
 #endif // DEFINITION_H

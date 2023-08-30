@@ -11,8 +11,8 @@ MsgAnalyzer::~MsgAnalyzer(){
 }
 
 void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-    int timestamp=QDateTime::currentMSecsSinceEpoch();
-    information["timestamp"]=timestamp;
+    //int timestamp=QDateTime::currentMSecsSinceEpoch();
+    //information["timestamp"]=timestamp;
     if(information["type"]=="file"){
         FileManager::ToFlie(information["data"].toString(),FILE_PATH,information["fileName"].toString(),information["sender"].toInt(),information["receiver"].toInt(),information["timestamp"].toInt());
         information["data"]=information["fileName"];
@@ -64,8 +64,8 @@ void MsgAnalyzer::anaylze(){
                         for (QList<Client>::iterator iter = m_clients->begin(); iter != m_clients->end(); iter++){//找到对应id的socket
                             if (iter->id==information["receiver"].toInt()){
                                 if(iter->sock->state()!=QAbstractSocket::UnconnectedState){
-                                    int timestamp=QDateTime::currentMSecsSinceEpoch();
-                                    information["timestamp"]=timestamp;
+                                    //int timestamp=QDateTime::currentMSecsSinceEpoch();
+                                    //information["timestamp"]=timestamp;
                                     sendJson(iter->sock,information);
                                     flag=1;
                                     break;

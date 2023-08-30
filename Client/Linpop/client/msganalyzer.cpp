@@ -59,10 +59,6 @@ void MsgAnalyzer::sendError(QTcpSocket* socket,QString error){
     socket->write(jsonString.toUtf8());
 }
 
-void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-
-}
-
 void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
     QJsonDocument document=QJsonDocument::fromJson(message.toUtf8());
     if (!document.isNull()) {
@@ -74,6 +70,15 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
                 }
                 else
                     QMessageBox::information(nullptr, "Information", information["data"].toString());
+            }
+            if(information["function"].toString()=="information"){
+                if(information["size"]!=information["data"].toString().length())
+                    sendError(socket,"incomplete data");
+                else{
+                    information["id"]=information["sender"];
+                    information["active"]=false;
+                    emit storeIntoDatabase(information);
+                }
             }
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
@@ -94,8 +99,6 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message,bool tag){//tag用�
             }
             if(information["function"].toString()=="ok")
                 emit ok(information);
-
-
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
             sendError(socket,e.what());

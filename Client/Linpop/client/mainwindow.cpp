@@ -142,7 +142,8 @@ MainWindow::MainWindow(QWidget *parent)
 
             QString editorMsg = m_mainBar->m_chatEditor->toPlainText();
             m_mainBar->m_chatEditor->setText("");
-            QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+            int timestamp=QDateTime::currentDateTime().toTime_t();
+            QString time = QString::number(timestamp); //时间戳
             MYLOG<<"addMessage" << editorMsg << time;
             if(editorMsg != "") {
                 message msg;
@@ -152,10 +153,23 @@ MainWindow::MainWindow(QWidget *parent)
                 m_mainBar->addMessage(msg);
                 m_profile->m_chatList[remoteIp].append(msg);
                 QString data = editorMsg;
-                if(m_profile->useServer) // 使用服务端发送
-                    m_server->m_tcpClient[remoteIp]->write(data.toUtf8());
-                else // 使用客户端发送
-                    m_client->m_tcpClient[remoteIp]->write(data.toUtf8()); // 从client连接池中找到对应ip的客户端并发送消息
+                profile target=m_profile->m_contactProfile[index];
+                msg.ip=target.ip;
+                msg.id=target.id;
+                QJsonObject json;
+                json["id"]=QString(msg.id).toInt();
+                json["sender"]=m_id;
+                json["receiver"]=QString(msg.id).toInt();
+                json["data"]=msg.msg;
+                json["function"]="information";
+                json["type"]="text";
+                json["timestamp"]=timestamp;
+                json["active"]=true;
+                json["size"]=msg.msg.length();
+                QJsonDocument jsonDoc(json);
+                QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+                m_client->sendToServer(jsonString);
+                db->addMessage(json);
             }
         }
     });
@@ -169,6 +183,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     MYLOG<<"ui initialezed completed!";
 
+    db=new ClientDataBase;
     connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::successLogin);
     connect(this->m_client->analyzer,&MsgAnalyzer::successLogin,this,&MainWindow::login);
     connect(this->m_client,&TcpClient::AddFriend,this,&MainWindow::sendToNewFriend);
@@ -217,11 +232,15 @@ void MainWindow::tryLogin(QString id, QString password)
     QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
     m_client->m_server->write(jsonString.toUtf8());
     m_id=id.toInt();
+
 }
 
 void MainWindow::login(QString name)
 {
     m_name=name;
+    db->m_id=m_id;
+    db->connectDataBase();
+    connect(this->m_client->analyzer,&MsgAnalyzer::storeIntoDatabase,this->db,&ClientDataBase::addMessage);
     this->show();
 }
 

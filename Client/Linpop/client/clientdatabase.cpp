@@ -5,69 +5,52 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QJsonObject>
+#include "global.h"
 
 ClientDataBase::ClientDataBase()
 {
-
 }
 
 bool ClientDataBase::connectDataBase(){
     // 创建一个QSqlDatabase对象，用于连接数据库
-    db = QSqlDatabase::addDatabase("QSQLITE","cdb");
-
+    db = QSqlDatabase::addDatabase("QSQLITE","data");
     // 指定数据库路径，如果路径不存在，将会创建一个新数据库
-    db.setDatabaseName("../ClientDataBase/ClientDataBase.db");
-
-    //查找数据库在本地的位置
-    /*QString databasePath = QCoreApplication::applicationDirPath() + "/:memory:.db";
-    QString newDatabasePath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/:memory:.db";
-    qDebug() << databasePath;
-    qDebug() << newDatabasePath;
-    //QFile::copy(databasePath, newDatabasePath);
-    */
-
+    db.setDatabaseName(DATABASE+QString::number(m_id)+DATABASENAME);
     // 尝试建立到数据库的连接
     if (!db.open()) {
         qDebug() << "Failed to connect to database:" << db.lastError();
         return false;
     }
-
     query=QSqlQuery(db);
-
-    /*
-    //删除表
+    /*删除表
     if(!query.exec("DROP TABLE history;")){
         qDebug() << "Failed to drop table history";
-    }
-    */
-
-
+    }*/
     // 创建一个表
-    if (!query.exec("CREATE TABLE history (id TEXT, timestamp TEXT PRIMARY KEY, type TEXT, data TEXT, isSender INTEGER)")) {
+    if (!query.exec("CREATE TABLE history (id TEXT, timestamp INTEGER PRIMARY KEY, type TEXT, data TEXT, isSender INTEGER)")) {
         qDebug() << "Failed to create table history:" << query.lastError();
     }
 
     return true;
 }
 
-bool ClientDataBase::addMessage(QJsonObject jsonMessage){
-    QVariantList id;id << jsonMessage["id"].toVariant();
-    QVariantList timestamp;timestamp << jsonMessage["timestamp"].toVariant();
-    QVariantList type;type << jsonMessage["type"].toVariant();
-    QVariantList data;data << jsonMessage["data"].toVariant();
-    QVariantList isSender;id << jsonMessage["isSender"].toVariant();
-    query.prepare("INSERT INTO history VALUES (?,?,?,?,?)");
+void ClientDataBase::addMessage(QJsonObject jsonMessage) {
+    QString id = QString::number(jsonMessage["id"].toInt());
+    int timestamp = jsonMessage["timestamp"].toInt();
+    QString type = jsonMessage["type"].toString();
+    QString data = jsonMessage["data"].toString();
+    bool isSender = jsonMessage["active"].toBool();
+    qDebug()<<id<<timestamp<<type<<data<<isSender<<endl;
+    query.prepare("INSERT INTO history VALUES (?, ?, ?, ?, ?)");
     query.addBindValue(id);
     query.addBindValue(timestamp);
     query.addBindValue(type);
     query.addBindValue(data);
     query.addBindValue(isSender);
-    if(!query.execBatch()){
+
+    if (!query.exec())
         qDebug() << "Failed to add history: " << query.lastError();
-        return false;
-    }
-    qDebug() << "Succeed to add history!";
-    return true;
+    qDebug() << "Succeeded in adding history!";
 }
 
 bool ClientDataBase::getMessage(QString id, QList<QJsonObject> &jsonMessageList){

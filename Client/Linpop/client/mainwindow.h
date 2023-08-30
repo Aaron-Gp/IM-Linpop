@@ -15,6 +15,7 @@
 #include <tcpserver.h>
 #include <tcpclient.h>
 #include "login.h"
+#include "clientdatabase.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,6 +39,7 @@ public:
     QFrame* middleUi();
     QFrame* rightUi();
     void makeFakeData();
+    ClientDataBase* db;
 public slots:
     void tryLogin(QString id,QString password);
     void login(QString name);
@@ -58,9 +60,9 @@ private:
     ProfileManager *m_profile;
     TcpServer *m_server;
     TcpClient *m_client;
-    int m_id;
     QString m_ip;
     QString m_name;
+    int m_id;
 };
 
 #endif // MAINWINDOW_H
