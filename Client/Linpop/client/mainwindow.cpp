@@ -121,6 +121,11 @@ void MainWindow::setUpUi()
                 m_mainBar->addMessage(msg);
                 MYLOG<<"add msg to main bar";
             }
+            QJsonObject obj;
+            obj["id"]=c_id;obj["timestamp"]=msg.time;
+            obj["type"]="message";obj["data"]=msg.msg;
+            obj["isSender"]=1;
+            m_profile->m_db->addMessage(obj);
         }
     });
 
@@ -195,6 +200,20 @@ void MainWindow::rcvLogin()
 {
     setUpUi();
     this->show();
+    MYLOG<<"database: "<<DATABASE+m_profile->m_id+".db";
+    m_profile->m_db->connectDataBase(DATABASE+m_profile->m_id+".db");
+//    m_profile->m_db->connectDataBase()
+    QList<QJsonObject> jsonMessageList;
+    m_profile->m_db->getContact(jsonMessageList);
+    foreach (QJsonObject jsonMessage, jsonMessageList) {
+        profile pf;
+        pf.id = jsonMessage["id"].toString();
+        pf.ip = jsonMessage["ip"].toString();
+        pf.name = jsonMessage["name"].toString();
+        pf.avatar = jsonMessage["avatar"].toString();
+        m_profile->m_contact.append(pf.id);
+        m_profile->m_contactProfile.insert(pf.id, pf);
+    }
     emit closeLoginWindow();
 }
 

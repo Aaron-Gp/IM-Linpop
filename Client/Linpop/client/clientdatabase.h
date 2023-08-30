@@ -10,7 +10,9 @@ class ClientDataBase
 {
 public:
     ClientDataBase();
-    bool connectDataBase();//连接数据库
+    bool connectDataBase(QString dbPath);//连接数据库
+    bool addContact(QJsonObject jsonMessage);//客户端存入联系人
+    bool getContact(QList<QJsonObject> &jsonMessageList);//客户端查询联系人
     bool addMessage(QJsonObject jsonMessage);//客户端存入消息记录
     bool getMessage(QString id, QList<QJsonObject> &jsonMessageList);//客户端输出消息记录
     bool selectHistoryByData(QString id, QString dataPart, QList<QJsonObject> &jsonMessageList);//客户端查询消息记录
