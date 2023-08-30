@@ -9,6 +9,7 @@
 #include <QToolButton>
 #include <QTextEdit>
 #include <QDateTime>
+#include <QMoveEvent>
 
 MainBar::MainBar(QWidget *parent) : QFrame(parent)
 {
@@ -103,29 +104,36 @@ void MainBar::setupMainBar()
     emojiBtn->setIcon(QIcon(":/icons/emoji"));
     emojiBtn->setIconSize(QSize(32,32));
 
-    connect(emojiBtn, &QToolButton::clicked,[=](){
-        MYLOG<<"emoji";
-        bar = new EmojiBar(emojiBtn);
-        bar->showEmoji(emojiBtn);
-        const QPoint buttonPos = emojiBtn->mapToGlobal(QPoint(0, 0));
-        bar->tableWidget->move(buttonPos.x(), buttonPos.y() - bar->tableWidget->height());
+    emojiBar = EmojiBar::showEmoji(nullptr);
+    connect(emojiBar, &QTableWidget::itemClicked, [&](){
+        // 获取当前选中的行和列
+        int row = emojiBar->currentRow();
+        int column = emojiBar->currentColumn();
+        // 获取选中项的数据
+        QTableWidgetItem *item = emojiBar->item(row,column);
+        MYLOG << item;
+        if (item) {
+            // 使用QTableWidgetItem的方法获取数据
+            QString data = item->text();
+            m_chatEditor->insertPlainText(data);
+            emojiBar->setVisible(false);
+            emojiBar->clearSelection();
+        }
+    });
+    emojiBar->setVisible(false);
 
-        connect(bar->tableWidget, &QTableWidget::itemClicked, [&](){
-            // 获取当前选中的行和列
-            int row = bar->tableWidget->currentRow();
-            int column = bar->tableWidget->currentColumn();
-            // 获取选中项的数据
-            QTableWidgetItem *item = bar->tableWidget->item(row,column);
-            MYLOG << item;
-            if (item) {
-                // 使用QTableWidgetItem的方法获取数据
-                QString data = item->text();
-                m_chatEditor->insertPlainText(data);
-                // 在这里处理数据...
-                MYLOG << data;
-                bar->tableWidget->close();
-            }
-        });
+    connect(emojiBtn, &QToolButton::clicked,[=](){
+        if(!emojiBar->isVisible()){
+            emojiBar->setVisible(true);
+            MYLOG<<"emoji";
+
+            const QPoint buttonPos = emojiBtn->mapToGlobal(QPoint(0, 0));
+            emojiBar->move(buttonPos.x(), buttonPos.y() - emojiBar->height());
+
+        }else{
+            emojiBar->setVisible(false);
+        }
+
     });
 
     toolCLayout->addWidget(emojiBtn);
@@ -151,6 +159,7 @@ void MainBar::setupMainBar()
     chatCLayout->setContentsMargins(10,0,10,0);
 
     m_chatEditor = new QTextEdit;
+    m_chatEditor->setFontPointSize(16);
     chatCLayout->addWidget(m_chatEditor);
     chatCFrame->setLayout(chatCLayout);
     chatLayout->addWidget(chatCFrame);
@@ -229,6 +238,14 @@ void MainBar::clearBroswer()
 {
     m_chatBroswer->clear();
     m_chatEditor->clear();
+}
+
+void MainBar::moveEvent(QMoveEvent *event)
+{
+    if(emojiBar!=nullptr){
+        const QPoint buttonPos = emojiBtn->mapToGlobal(QPoint(0, 0));
+        emojiBar->move(buttonPos.x(), buttonPos.y() - emojiBar->height());
+    }
 }
 
 void MainBar::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)

@@ -12,9 +12,7 @@ class EmojiBar : public QWidget
 public:
     explicit EmojiBar(QWidget *parent = nullptr);
 
-    void showEmoji(QWidget *parent);
-    QTableWidget *tableWidget;
-
+    static QTableWidget* showEmoji(QWidget *parent);
 
 signals:
 

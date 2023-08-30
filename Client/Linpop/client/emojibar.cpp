@@ -9,14 +9,13 @@ EmojiBar::EmojiBar(QWidget *parent) : QWidget(parent)
 
 }
 
-void EmojiBar::showEmoji(QWidget *parent=nullptr)
+QTableWidget* EmojiBar::showEmoji(QWidget *parent=nullptr)
 {
     QString emojis[]={"😄","😆","😊","😃","😏","😍","😘","😚","😳","😌","😆","😁","😉","😜","😝","😀","😗","😙","😛","😴","😟","😦","😧","😮","😬","😕","😯","😑","😒","😅","😓","😥","😩","😔","😞","😖","😨","😰","😣","😢","😭","😂","😲","😱","😫","😠","😡","😤","😪","😋","😷","😎","😵","👿","😈","😐","😶","😇"};
-    tableWidget = new QTableWidget();
+    QTableWidget *tableWidget = new QTableWidget();
 
-    tableWidget->setWindowFlags(Qt::Popup|Qt::WindowStaysOnTopHint);
+    tableWidget->setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     tableWidget->setFixedSize(300,150);//设置大小
-    MYLOG<<parent->geometry()<<" "<<tableWidget->geometry();
     tableWidget->setRowCount(5); // 设置行数
     tableWidget->setColumnCount(5); // 设置列数
     tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);//固定行高
@@ -49,4 +48,5 @@ void EmojiBar::showEmoji(QWidget *parent=nullptr)
         lable->setAlignment(Qt::AlignHCenter);      		//设置QLable控件居中显示
         tableWidget->setCellWidget(i/5,i%5,lable);     		//显示添加QLable到控件*/
     tableWidget->setVisible(true);
+    return tableWidget;
 }

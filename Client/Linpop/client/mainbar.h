@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QVector>
 #include <profilemanager.h>
+#include <QTableWidget>
 #include "global.h"
 #include "emojibar.h"
 
@@ -32,10 +33,13 @@ public:
     void addMessages(Message msgs);
     void clearBroswer();
 
-    EmojiBar *bar;
+    QTableWidget *emojiBar=nullptr;
     QPushButton *sendBtn;
     QFrame *historyFrame, *toolCFrame, *chatFrame, *chatCFrame, *sendCFrame;
     QToolButton *emojiBtn, *imageBtn, *fileBtn;
+
+protected:
+    void moveEvent(QMoveEvent *event);
 
 private:
     void setupUi();
