@@ -80,9 +80,6 @@ void MsgAnalyzer::sendError(QTcpSocket* socket,QString error){
     socket->write(jsonString.toUtf8());
 }
 
-void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-
-}
 
 void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
     QJsonDocument document=QJsonDocument::fromJson(message.toUtf8());
@@ -96,6 +93,16 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
                 else
                     QMessageBox::information(nullptr, "Information", information["data"].toString());
             }
+            if(information["function"].toString()=="information"){
+                if(information["size"]!=information["data"].toString().length())
+                    sendError(socket,"incomplete data");
+                else{
+                    information["id"]=QString::number(information["sender"].toInt());
+                    information["active"]=false;
+
+                    emit storeIntoDatabase(information);
+                }
+            }
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
             sendError(socket,e.what());
@@ -103,6 +110,8 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
     }else
         sendError(socket,"improper json");
 }
+
+
 
 void MsgAnalyzer::sendMessage(QTcpSocket *socket, QString function, message *msg = nullptr)
 {
@@ -115,9 +124,9 @@ void MsgAnalyzer::sendMessage(QTcpSocket *socket, QString function, message *msg
             obj["msg"]=msg->msg;
         }
         obj["id"]=m_profile->m_id;
-        QByteArray arr_base64 = m_profile->m_avatar.toUtf8();
-        ba = QByteArray::fromBase64(arr_base64);
-        MYLOG<<ba;
+        //QByteArray arr_base64 = m_profile->m_avatar.toUtf8();
+        //ba = QByteArray::fromBase64(arr_base64);
+        //MYLOG<<ba;
 //        obj["avatar"]=QJsonValue::fromVariant(ba);
     }else if(function=="file"){
         obj["msg"]=msg->msg; // 文件信息
@@ -175,9 +184,8 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
                 m_profile->m_contact.append(id);
                 m_profile->m_contactProfile.insert(id, profile());
                 m_profile->m_chatList.insert(id,Message());
-
                 m_profile->m_contactProfile[id].ip = ip;
-
+                m_profile->m_contactProfile[id].id = id;
 //                QByteArray buf = socket->readAll();
 //                MYLOG<<buf;
 //                QByteArray avatar = obj.value("avatar").toVariant().toByteArray();
@@ -190,10 +198,11 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
                 emit m_profile->addContact();
             }else{
                 m_profile->m_contactProfile[id].ip = ip;
-                QByteArray avatar = obj.value("avatar").toVariant().toByteArray();
-                QByteArray ba2 = avatar.toBase64();
-                QString b64str = QString::fromUtf8(ba2);
-                m_profile->m_contactProfile[id].avatar = b64str;
+                //QByteArray avatar = obj.value("avatar").toVariant().toByteArray();
+                //QByteArray ba2 = avatar.toBase64();
+                //QString b64str = QString::fromUtf8(ba2);
+                m_profile->m_contactProfile[id].avatar = "";
+                m_profile->m_contactProfile[id].id = id;
 //                MYLOG<<b64str.mid(0,100);
                 emit m_profile->updateListBar();
             }

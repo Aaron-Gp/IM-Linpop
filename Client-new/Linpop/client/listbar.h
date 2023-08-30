@@ -24,8 +24,9 @@ class ListBar : public QFrame
 public:
     explicit ListBar(QWidget *parent = nullptr);
     void addContact(profile pf);
-    void updateContactList();
 
+public slots:
+    void updateContactList();
 private:
     void setupUi();
     void setupTopBar();

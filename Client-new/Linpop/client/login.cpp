@@ -40,7 +40,6 @@ void login::on_loginButon_clicked()
 
     m_profile->m_id = id;
     m_profile->m_password = password;
-
     emit tryLogin(id,password);
 }
 

@@ -6,10 +6,10 @@
 #include <QVector>
 #include <QList>
 #include <QImage>
-#include "clientdatabase.h"
 #include "global.h"
 
 class ClientToServer;
+class ClientDataBase;
 
 typedef struct{
     QString msg;
@@ -49,6 +49,9 @@ public:
     ClientToServer *m_clientToServer;
     ClientDataBase *m_db;
 
+public slots:
+    void updateMessage();
+    void updateProfiles();
 private:
     ProfileManager(QObject *parent = nullptr);
     static ProfileManager *self;
@@ -57,7 +60,7 @@ signals:
     void addContact();
     void appendMsg(QString id, message msg);
     void updateListBar();
-
+    void update();
 };
 
 #endif // PROFILEMANAGER_H

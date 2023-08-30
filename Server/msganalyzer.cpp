@@ -111,6 +111,7 @@ void MsgAnalyzer::anaylze(){
                             FileManager::deleteFile(FILE_PATH,(*iter)["fileName"].toString(),(*iter)["sender"].toInt(),(*iter)["receiver"].toInt(),(*iter)["timestamp"].toInt());
                         }
                         (*iter)["size"]=(*iter)["data"].toString().length();
+                        (*iter)["function"]="information";
                         sendJson(msg.socket,*iter);
                     }
                     db.deleteMessage(information["sender"].toInt());

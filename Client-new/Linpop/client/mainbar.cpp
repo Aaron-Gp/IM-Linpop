@@ -177,8 +177,14 @@ void MainBar::setupMainBar()
     m_layout->addWidget(m_splitter);
 }
 
+void MainBar::UpdateCharList(){
+
+    changeBar(cur_id);
+}
+
 void MainBar::changeBar(QString id)
 {
+    cur_id=id;
     QString ip = m_profile->m_contactProfile[id].ip;
     m_title=id+"("+ip+")";
     QLabel *title = m_topBar->findChild<QLabel*>();

@@ -38,6 +38,7 @@ public:
     QFrame *historyFrame, *toolCFrame, *chatFrame, *chatCFrame, *sendCFrame;
     QToolButton *emojiBtn, *imageBtn, *fileBtn;
 
+    QString cur_id;
 private:
     void setupUi();
     void setupTopBar();
@@ -54,6 +55,8 @@ public:
     QString m_title="";
     QSplitter *m_splitter;
     ProfileManager *m_profile;
+public slots:
+    void UpdateCharList();
 };
 
 #endif // MAINBAR_H

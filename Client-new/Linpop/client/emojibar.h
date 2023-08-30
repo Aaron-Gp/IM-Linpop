@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "global.h"
 
-#include <QTableWidget>;
+#include <QTableWidget>
 
 class EmojiBar : public QWidget
 {

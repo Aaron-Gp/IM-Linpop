@@ -3,6 +3,7 @@
 #include <QBuffer>
 #include <QPixmap>
 #include <QByteArray>
+#include "clientdatabase.h"
 
 ProfileManager* ProfileManager::self = NULL;
 
@@ -45,6 +46,24 @@ QImage ProfileManager::byte2img(const QString& p_b)
 
     return img;
 }
+
+void ProfileManager::updateMessage()
+{
+    m_chatList=m_db->getMessage();
+    emit update();
+}
+
+
+void ProfileManager::updateProfiles(){
+    m_contactProfile=m_db->getProfile();
+    m_contact.clear();
+    for (const QString &id : m_contactProfile.keys()) {
+        m_contact.append(id);
+    }
+    emit updateListBar();
+}
+
+
 
 ProfileManager::ProfileManager(QObject *parent) : QObject(parent)
 {

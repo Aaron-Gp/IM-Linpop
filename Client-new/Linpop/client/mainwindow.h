@@ -14,6 +14,7 @@
 #include "tcpclient.h"
 #include "global.h"
 #include <msganalyzer.h>
+#include "clientdatabase.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,7 +42,6 @@ public:
     void makeFakeData();
     QGridLayout *mainLayout;
     MsgAnalyzer *m_analyzer;
-
 signals:
     void switched(int index);
     void closeLoginWindow();
