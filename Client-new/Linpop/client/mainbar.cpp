@@ -202,8 +202,7 @@ void MainBar::addMessage(message msg)
     MYLOG<<time<<" "<<message<<" "<<ip;
     QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
-
-    if(ip==m_profile->m_ip){
+    if(msg.isSender=="1"){
         dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
     }else{
         dealMessage(messageW, item, message, time, QNChatMessage::User_Other);
@@ -223,7 +222,7 @@ void MainBar::addMessages(Message msgs)
         QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
-        if(ip==m_profile->m_ip){
+        if(msg.isSender=="1"){
             dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
         }else{
             dealMessage(messageW, item, message, time, QNChatMessage::User_Other);
