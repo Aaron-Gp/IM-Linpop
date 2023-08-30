@@ -24,7 +24,6 @@ signals:
 
 public:
     QVector<QToolButton*> toolVector;
-private:
     QFrame *m_topBar;
     QVBoxLayout *m_layout;
     QtMaterialAvatar *m_avatar;

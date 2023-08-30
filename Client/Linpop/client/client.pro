@@ -3,8 +3,10 @@ TEMPLATE = app
 CONFIG += c++14
 SOURCES = main.cpp \
     cabstractemojitable.cpp \
+    changeheaderwnd.cpp \
     clientdatabase.cpp \
     clienttoserver.cpp \
+    dragscrollarea.cpp \
     emojitab.cpp \
     filetransfer.cpp \
     listbar.cpp \
@@ -19,8 +21,10 @@ SOURCES = main.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
     cabstractemojitable.h \
+    changeheaderwnd.h \
     clientdatabase.h \
     clienttoserver.h \
+    dragscrollarea.h \
     emojitab.h \
     filetransfer.h \
     global.h \
@@ -40,6 +44,7 @@ TARGET = client-exe
 PRE_TARGETDEPS += $$top_builddir/components/$(OBJECTS_DIR)/libcomponents.a
 
 FORMS += \
+    ChangeHeaderWnd.ui \
     login.ui \
     mainwindow.ui
 

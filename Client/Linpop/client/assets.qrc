@@ -11,4 +11,5 @@
         <file alias="emoji">assets/emoji.svg</file>
         <file alias="p2p">assets/p2p.svg</file>
     </qresource>
+    <qresource prefix="/new/prefix1"/>
 </RCC>

@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QNetworkInterface>
+#include "changeheaderwnd.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -126,7 +127,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_listBar->addContact(pf);
         m_listBar->messageWidget->setCurrentRow(m_listBar->messageWidget->count()-1);
         //面板更新
-        m_mainBar->changeBar("", pf.ip);
+//        m_mainBar->changeBar("", pf.ip);
     });
 
     connect(m_server, &TcpServer::appendMsg, [=](QString ip, message msg){
@@ -164,6 +165,18 @@ MainWindow::MainWindow(QWidget *parent)
                     m_client->m_tcpClient[remoteIp]->write(data.toUtf8()); // 从client连接池中找到对应ip的客户端并发送消息
             }
         }
+    });
+
+
+    // 更换头像
+
+    connect(m_sideBar->m_avatar,&QtMaterialAvatar::clicked,[=](){
+        ChangeHeaderWnd *chooseHeader = new ChangeHeaderWnd();
+        chooseHeader->show();
+        connect(chooseHeader, &ChangeHeaderWnd::updateHeader,[=](QPixmap header){
+            m_sideBar->m_avatar->setImage(header.toImage());
+            chooseHeader->close();
+        });
     });
 
     MYLOG<<"all functions initialized!";
