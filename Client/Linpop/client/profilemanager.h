@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QVector>
 #include <QList>
+#include <QImage>
 #include "clientdatabase.h"
 #include "global.h"
 
@@ -21,7 +22,7 @@ typedef struct{
 typedef struct{
     QString id;
     QString ip;
-    QString avatar=":/icons/person";
+    QString avatar;
     QString name;
 }profile;
 
@@ -32,18 +33,18 @@ class ProfileManager : public QObject
     Q_OBJECT
 public:
     static ProfileManager* getInstance();
-    QString img2byte(QImage img);
-    QPixmap byte2img(QString p_b);
+    static QString img2byte(const QImage& img);
+    static QImage byte2img(const QString& p_b);
 
     QString m_ip;
     QString m_name;
     QString m_id;
     QString m_password;
-    QString m_avatar=":/icons/avatar";
+    QString m_avatar; // 存base64编码
     bool useServer = false;
 
     QList<QString> m_contact;
-    QVector<profile> m_contactProfile;
+    QMap<QString,profile> m_contactProfile;
     QMap<QString,Message> m_chatList;
     ClientToServer *m_clientToServer;
     ClientDataBase *m_db;
@@ -53,6 +54,8 @@ private:
     static ProfileManager *self;
 
 signals:
+    void addContact();
+    void appendMsg(QString id, message msg);
 
 };
 

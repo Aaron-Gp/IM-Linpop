@@ -13,6 +13,7 @@
 #include "tcpserver.h"
 #include "tcpclient.h"
 #include "global.h"
+#include <msganalyzer.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,7 @@ class QFrame;
 class QListWidget;
 class QListWidgetItem;
 class QTextEdit;
+class QGridLayout;
 
 class MainWindow : public QMainWindow
 {
@@ -32,10 +34,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void setUpUi();
     QFrame* leftUi();
     QFrame* middleUi();
     QFrame* rightUi();
     void makeFakeData();
+    QGridLayout *mainLayout;
+    MsgAnalyzer *m_analyzer;
 
 signals:
     void switched(int index);
@@ -48,8 +53,6 @@ private:
     SideBar *m_sideBar;
     ListBar *m_listBar;
     MainBar *m_mainBar;
-    QtMaterialAvatar *m_avatar;
-    QtMaterialBadge *m_badge;
     QJsonArray *fakeListData;
     QTextEdit *m_chatEditor;
     QListWidget *m_chatBroswer;

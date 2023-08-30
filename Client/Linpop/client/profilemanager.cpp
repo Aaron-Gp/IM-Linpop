@@ -1,5 +1,8 @@
 #include "profilemanager.h"
 #include <QMutex>
+#include <QBuffer>
+#include <QPixmap>
+#include <QByteArray>
 
 ProfileManager* ProfileManager::self = NULL;
 
@@ -20,7 +23,31 @@ ProfileManager *ProfileManager::getInstance()
     return self; //返回指针
 }
 
+QString ProfileManager::img2byte(const QImage& img)
+{
+    QByteArray ba;
+    QBuffer buf(&ba);
+    buf.open(QIODevice::WriteOnly);
+
+    img.save(&buf, "png");
+    QByteArray ba2 = ba.toBase64();
+    QString b64str = QString::fromUtf8(ba2);
+
+    return b64str;
+}
+
+QImage ProfileManager::byte2img(const QString& p_b)
+{
+    MYLOG<<"Here";
+    QImage img;
+    QByteArray arr_base64 = p_b.toUtf8();
+    img.loadFromData(QByteArray::fromBase64(arr_base64));
+
+    return img;
+}
+
 ProfileManager::ProfileManager(QObject *parent) : QObject(parent)
 {
     m_db = new ClientDataBase;
+    m_avatar = img2byte(QImage(":/icons/avatar"));
 }

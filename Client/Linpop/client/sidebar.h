@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QFrame>
 #include "global.h"
+#include "profilemanager.h"
 
 class QVBoxLayout;
 class QtMaterialAvatar;
@@ -28,6 +29,7 @@ public:
     QVBoxLayout *m_layout;
     QtMaterialAvatar *m_avatar;
     QString m_avatarPath = ":/icons/avatar";
+    ProfileManager *m_profile;
 
 };
 

@@ -6,6 +6,7 @@
 #include <QHostAddress>
 #include <QAbstractSocket>
 #include <profilemanager.h>
+#include "msganalyzer.h"
 #include "global.h"
 
 class TcpClient : public QWidget
@@ -18,6 +19,8 @@ public:
     ~TcpClient();
     ProfileManager *m_profile;
     QMap<QString, QTcpSocket*> m_tcpClient;
+    QMap<QString, QTcpSocket*> m_fileClient;
+    MsgAnalyzer *m_analyzer;
 
 signals:
     void appendMsg(QString ip, message msg);

@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <profilemanager.h>
+#include "msganalyzer.h"
 #include <global.h>
 
 class TcpServer : public QWidget
@@ -21,7 +22,9 @@ public:
     ProfileManager *m_profile;
     QTcpServer *tcpServer;
     QMap<QString, QTcpSocket*> m_tcpClient;
+    QMap<QString, QTcpSocket*> m_fileClient;
     QTcpSocket *currentClient;
+    MsgAnalyzer *m_analyzer;
 
 signals:
     void appendMsg(QString ip, message msg);

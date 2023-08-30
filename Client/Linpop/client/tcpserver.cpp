@@ -5,6 +5,7 @@ TcpServer::TcpServer(QWidget *parent) : QWidget(parent)
 {
     tcpServer = new QTcpServer();
     m_profile = ProfileManager::getInstance();
+    m_analyzer = MsgAnalyzer::getInstance();
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(NewConnectionSlot()));
 }
 
@@ -41,13 +42,14 @@ void TcpServer::NewConnectionSlot()
     connect(currentClient, &QTcpSocket::readyRead, [=](){
         QByteArray buffer = currentClient->readAll();
         if(!buffer.isEmpty()){
-            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
-            MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
-            message msg;
-            msg.msg = QString::fromUtf8(buffer);
-            msg.ip=ip;
-            msg.time=QString::number(QDateTime::currentDateTime().toTime_t());
-            emit appendMsg(ip, msg);
+            m_analyzer->receiveMessage(currentClient, buffer, true);
+//            QString ip = currentClient->peerAddress().toString().split("::ffff:")[1]+":"+QString::number(currentClient->peerPort());
+//            MYLOG<<ip<<" : "<<QString::fromUtf8(buffer);
+//            message msg;
+//            msg.msg = QString::fromUtf8(buffer);
+//            msg.ip=ip;
+//            msg.time=QString::number(QDateTime::currentDateTime().toTime_t());
+//            emit appendMsg(ip, msg);
         }
     });
 
@@ -65,17 +67,7 @@ void TcpServer::NewConnectionSlot()
 
     m_tcpClient.insert(ip,currentClient);
 
-    // 如果联系人不存在则创建新的联系人信息和对话信息
-    bool exist = m_profile->m_contact.contains(ip);
-    if(!exist){
-        m_profile->m_contact.append(ip);
-        profile newContact;
-        newContact.ip = ip;
-        m_profile->m_contactProfile.append(newContact);
-        m_profile->m_chatList.insert(ip, Message());
-        emit addContact(newContact);
-    }
     // 打招呼
-    QString data = "Hello, you can chat to "+m_profile->m_ip+" now!";
-    currentClient->write(data.toUtf8());
+//    QString data = "Hello, you can chat to "+m_profile->m_ip+" now!";
+    m_analyzer->sendMessage(currentClient, "init", nullptr);
 }

@@ -11,5 +11,11 @@
         <file alias="emoji">assets/emoji.svg</file>
         <file alias="p2p">assets/p2p.svg</file>
     </qresource>
-    <qresource prefix="/new/prefix1"/>
+    <qresource prefix="/">
+        <file>assets/UI/Image/close.png</file>
+        <file>assets/UI/Image/rotate_anti_hover.png</file>
+        <file>assets/UI/Image/rotate_anti_normal.png</file>
+        <file>assets/UI/Image/rotate_clock_hover.png</file>
+        <file>assets/UI/Image/rotate_clock_normal.png</file>
+    </qresource>
 </RCC>

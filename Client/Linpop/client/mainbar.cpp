@@ -150,13 +150,14 @@ void MainBar::setupMainBar()
     m_layout->addWidget(m_splitter);
 }
 
-void MainBar::changeBar(QString name, QString ip)
+void MainBar::changeBar(QString id)
 {
-    m_title=name+ip;
+    QString ip = m_profile->m_contactProfile[id].ip;
+    m_title=id+"("+ip+")";
     QLabel *title = m_topBar->findChild<QLabel*>();
     title->setText(m_title);
     clearBroswer();
-    addMessages(m_profile->m_chatList[ip]);
+    addMessages(m_profile->m_chatList[id]);
 }
 
 void MainBar::addMessage(message msg)

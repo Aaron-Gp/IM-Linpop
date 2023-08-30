@@ -5,6 +5,7 @@
 
 SideBar::SideBar(QWidget *parent) : QFrame(parent)
 {
+    m_profile = ProfileManager::getInstance();
     setStyleSheet("QFrame{"
                   "background:rgb(234,234,234);"
                   "}"
@@ -35,7 +36,7 @@ void SideBar::setupUi()
 
 void SideBar::setupTopBar()
 {
-    m_avatar = new QtMaterialAvatar(QImage(m_avatarPath));
+    m_avatar = new QtMaterialAvatar(m_profile->byte2img(m_profile->m_avatar));
     m_topBar = new QFrame();
     m_topBar->setFrameStyle(QFrame::Box);
     m_topBar->setLineWidth(0);

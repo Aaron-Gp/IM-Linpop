@@ -26,7 +26,7 @@ public:
     explicit MainBar(QWidget *parent = nullptr);
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
-    void changeBar(QString name, QString ip);
+    void changeBar(QString id);
     void addMessage(message msg);
     void addMessages(Message msgs);
     void clearBroswer();
