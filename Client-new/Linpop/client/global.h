@@ -5,7 +5,7 @@
 #define PORT 6666
 #define DATABASE "../"
 #define DATABASENAME "data.db"
-
+#define FILEPATH "../FILE"
 #include <QDebug>
 #define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"
 //#define QT_NO_DEBUG_OUTPUT

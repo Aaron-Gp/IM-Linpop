@@ -99,9 +99,9 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
                 else{
                     information["id"]=QString::number(information["sender"].toInt());
                     information["active"]=false;
-
                     emit storeIntoDatabase(information);
                 }
+
             }
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常

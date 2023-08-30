@@ -1,4 +1,5 @@
 #include "clientdatabase.h"
+#include "filemanager.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -43,7 +44,8 @@ void ClientDataBase::addMessage(QJsonObject jsonMessage) {
     QString type = jsonMessage["type"].toString();
     QString data = jsonMessage["data"].toString();
     bool isSender = jsonMessage["active"].toBool();
-    qDebug()<<id<<timestamp<<type<<data<<isSender<<endl;
+    if(type=="file")
+        data=FileManager::ToFile(jsonMessage["fileName"].toString(),id,isSender,data);
     query.prepare("INSERT INTO history VALUES (?, ?, ?, ?, ?)");
     query.addBindValue(id);
     query.addBindValue(timestamp);
@@ -65,7 +67,7 @@ QMap<QString,Message> ClientDataBase::getMessage(){
         message msg;
         msg.id=QString::number(query.value("id").toInt());
         msg.time=QString::number(query.value("timestamp").toInt());
-        msg.isSender=query.value("isSender").toInt();
+        msg.isSender=query.value("isSender").toString();
         msg.msg=query.value("data").toString();
         //jsonMessage["type"] = query.value("type").toString();
         if (!messages.contains(msg.id))

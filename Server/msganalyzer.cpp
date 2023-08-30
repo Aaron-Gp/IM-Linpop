@@ -14,7 +14,7 @@ void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
     //int timestamp=QDateTime::currentMSecsSinceEpoch();
     //information["timestamp"]=timestamp;
     if(information["type"]=="file"){
-        FileManager::ToFlie(information["data"].toString(),FILE_PATH,information["fileName"].toString(),information["sender"].toInt(),information["receiver"].toInt(),information["timestamp"].toInt());
+        FileManager::ToFile(information["data"].toString(),FILE_PATH,information["fileName"].toString(),information["sender"].toInt(),information["receiver"].toInt(),information["timestamp"].toInt());
         information["data"]=information["fileName"];
     }
     db.addMessage(information);

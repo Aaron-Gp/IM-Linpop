@@ -7,7 +7,7 @@ FileManager::FileManager(){
 
 }
 
-void FileManager::ToFlie(QString binaryData,QString path,QString fileName,int sender,int receiver,int timeStamp){
+void FileManager::ToFile(QString binaryData,QString path,QString fileName,int sender,int receiver,int timeStamp){
     QDir dir(path);
     if (!dir.exists())
         if (!dir.mkpath(path))
