@@ -199,12 +199,12 @@ void MainBar::addMessage(message msg)
     QString time = msg.time;
     dealMessageTime(time);
     QString message = msg.msg;
-    QString ip = msg.ip;
-    MYLOG<<time<<" "<<message<<" "<<ip;
+    QString id = msg.id;
+    MYLOG<<time<<" "<<message<<" "<<id;
     QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
-    if(ip==m_profile->m_ip){
+    if(msg.isSender==1){
         dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
     }else{
         dealMessage(messageW, item, message, time, QNChatMessage::User_Other);
@@ -219,12 +219,12 @@ void MainBar::addMessages(Message msgs)
         QString time = msg.time;
         dealMessageTime(time);
         QString message = msg.msg;
-        QString ip = msg.ip;
-        MYLOG<<time<<" "<<message<<" "<<ip;
+        QString id = msg.id;
+        MYLOG<<time<<" "<<message<<" "<<id;
         QNChatMessage* messageW = new QNChatMessage(m_chatBroswer->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(m_chatBroswer);
 
-        if(ip==m_profile->m_ip){
+        if(msg.isSender==1){
             dealMessage(messageW, item, message, time, QNChatMessage::User_Me);
         }else{
             dealMessage(messageW, item, message, time, QNChatMessage::User_Other);

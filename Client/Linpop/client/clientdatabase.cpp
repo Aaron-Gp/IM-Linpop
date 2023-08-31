@@ -5,8 +5,9 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QJsonObject>
+#include "profilemanager.h"
 
-ClientDataBase::ClientDataBase()
+ClientDataBase::ClientDataBase(QWidget *parent):QWidget(parent)
 {
 
 }
@@ -31,97 +32,83 @@ bool ClientDataBase::connectDataBase(QString dbPath){
 //    }
 
     // 创建一个表
-    if (!query.exec("CREATE TABLE history (id TEXT, timestamp TEXT PRIMARY KEY, type TEXT, data TEXT, isSender INTEGER)")) {
+    if (!query.exec("CREATE TABLE history (uid integer primary key autoincrement, id TEXT, timestamp INTEGER, type TEXT, data TEXT, isSender INTEGER)")) {
         qDebug() << "Failed to create table history:" << query.lastError();
     }
 
-    if (!query.exec("CREATE TABLE contact (id TEXT PRIMARY KEY, ip TEXT, name TEXT, avatar TEXT)")) {
+    if (!query.exec("CREATE TABLE contact (id TEXT PRIMARY KEY, name varchar(256), avatar blob,ip varchar(128))")) {
         qDebug() << "Failed to create table contact:" << query.lastError();
     }
 
     return true;
 }
 
-bool ClientDataBase::addContact(QJsonObject jsonMessage)
-{
-    QVariantList id;id << jsonMessage["id"].toVariant();
-    QVariantList ip;ip << jsonMessage["ip"].toVariant();
-    QVariantList name;name << jsonMessage["name"].toVariant();
-    QVariantList avatar;avatar << jsonMessage["avatar"].toVariant();
-    query.prepare("INSERT INTO contact VALUES (?,?,?,?,?)");
-    query.addBindValue(id);
-    query.addBindValue(ip);
-    query.addBindValue(name);
-    query.addBindValue(avatar);
-    if(!query.execBatch()){
-        qDebug() << "Failed to add contact: " << query.lastError();
-        return false;
-    }
-    qDebug() << "Succeed to add contact!";
-    return true;
-}
-
-bool ClientDataBase::getContact(QList<QJsonObject> &jsonMessageList)
-{
-    query.prepare("SELECT * FROM contact ORDER BY name");
-    if(!query.execBatch()){
-        qDebug() << "Failed to select the contact: " << query.lastError();
-        return false;
-    }
-    while(query.next()){
-        QJsonObject jsonMessage;
-        jsonMessage["id"] = query.value("id").toString();
-        jsonMessage["ip"] = query.value("ip").toString();
-        jsonMessage["name"] = query.value("name").toString();
-        jsonMessage["avatar"] = query.value("avatar").toString();
-        jsonMessageList.append(jsonMessage);
-    }
-    qDebug() << "Succeed to get the history!";//isSender为true的时候说明发送者是该用户
-    return true;
-}
-
-
-
-bool ClientDataBase::addMessage(QJsonObject jsonMessage){
-    QVariantList id;id << jsonMessage["id"].toVariant();
-    QVariantList timestamp;timestamp << jsonMessage["timestamp"].toVariant();
-    QVariantList type;type << jsonMessage["type"].toVariant();
-    QVariantList data;data << jsonMessage["data"].toVariant();
-    QVariantList isSender;id << jsonMessage["isSender"].toVariant();
-    query.prepare("INSERT INTO history VALUES (?,?,?,?,?)");
+void ClientDataBase::addMessage(QJsonObject jsonMessage){
+    QString id = jsonMessage["id"].toString();
+    int timestamp = jsonMessage["timestamp"].toInt();
+    QString type = jsonMessage["type"].toString();
+    QString data = jsonMessage["data"].toString();
+    int isSender = jsonMessage["isSender"].toInt();
+    qDebug()<<id<<timestamp<<type<<data<<isSender<<endl;
+    query.prepare("INSERT INTO history VALUES (NULL, ?, ?, ?, ?, ?)");
     query.addBindValue(id);
     query.addBindValue(timestamp);
     query.addBindValue(type);
     query.addBindValue(data);
     query.addBindValue(isSender);
-    if(!query.execBatch()){
+    if (!query.exec())
         qDebug() << "Failed to add history: " << query.lastError();
-        return false;
-    }
-    qDebug() << "Succeed to add history!";
-    return true;
+    qDebug() << "Succeeded in adding history!";
+    emit finish();
 }
 
-bool ClientDataBase::getMessage(QString id, QList<QJsonObject> &jsonMessageList){
-    query.prepare("SELECT * FROM history WHERE id = ? ORDER BY timestamp");
-    QVariantList a;
-    a << id;
-    query.addBindValue(a);
-    if(!query.execBatch()){
+QMap<QString,Message> ClientDataBase::getMessage(){
+    if(!query.exec("SELECT * FROM history ORDER BY uid"))
         qDebug() << "Failed to select the history: " << query.lastError();
-        return false;
-    }
+    QMap<QString,Message> messages;
+    Message msgs;
     while(query.next()){
-        QJsonObject jsonMessage;
-        jsonMessage["id"] = query.value("id").toString();
-        jsonMessage["timestamp"] = query.value("timestamp").toString();
-        jsonMessage["type"] = query.value("type").toString();
-        jsonMessage["data"] = query.value("data").toString();
-        jsonMessage["isSender"] = query.value("isSender").toInt();
-        jsonMessageList.append(jsonMessage);
+        message msg;
+        msg.id=QString::number(query.value("id").toInt());
+        msg.time=QString::number(query.value("timestamp").toInt());
+        msg.isSender=query.value("isSender").toInt();
+        msg.msg=query.value("data").toString();
+        //jsonMessage["type"] = query.value("type").toString();
+        if (!messages.contains(msg.id))
+            messages[msg.id] = QVector<message>(); // 初始化对应的 QVector
+        messages[msg.id].append(msg); // 将消息添加到对应的 QVector 中
     }
-    qDebug() << "Succeed to get the history!";//isSender为true的时候说明发送者是该用户
-    return true;
+    return messages;
+}
+
+QMap<QString,profile> ClientDataBase::getProfile(){
+    if(!query.exec("SELECT * FROM contact"))
+        qDebug() << "Failed to select the history: " << query.lastError();
+    QMap<QString,profile> profiles;
+    while(query.next()){
+        profile profile;
+        profile.id=QString::number(query.value("id").toInt());
+        profile.name=query.value("name").toString();
+        profile.avatar=query.value("avatar").toString();
+        profile.ip=query.value("ip").toString();
+        profiles[profile.id]=profile;
+    }
+    return profiles;
+}
+
+void ClientDataBase::addProfile(profile new_connect)
+{
+    query.prepare("INSERT INTO contact (id, name, avatar, ip) VALUES (?, ?, ?, ?)");
+    query.addBindValue(new_connect.id.toInt()); // 假设 id 是整数类型
+    query.addBindValue(new_connect.name);
+    query.addBindValue(new_connect.avatar);
+    query.addBindValue(new_connect.ip);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to add new contact: " << query.lastError();
+    } else {
+        qDebug() << "New contact added successfully.";
+    }
 }
 
 bool ClientDataBase::selectHistoryByData(QString id, QString dataPart, QList<QJsonObject> &jsonMessageList){

@@ -20,7 +20,6 @@ class MsgAnalyzer:public QObject{
 public:
     static MsgAnalyzer* getInstance();
     ClientDataBase* db;
-    void storeIntoDatabase(QJsonObject information);
     void sendError(QTcpSocket *socket, QString error);
     void anaylze(QTcpSocket *socket, QString message);
     void sendMessage(QTcpSocket *socket, QString function, message* msg);
@@ -30,6 +29,7 @@ public:
 
 signals:
     void successLogin();
+    void storeIntoDatabase(QJsonObject information);
 public slots:
     void readMessage(QTcpSocket* socket);
 

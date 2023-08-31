@@ -2,13 +2,11 @@ QT += core gui widgets network sql
 TEMPLATE = app
 CONFIG += c++14
 SOURCES = main.cpp \
-    cabstractemojitable.cpp \
     changeheaderwnd.cpp \
     clientdatabase.cpp \
     clienttoserver.cpp \
     dragscrollarea.cpp \
     emojibar.cpp \
-    emojitab.cpp \
     filetransfer.cpp \
     listbar.cpp \
     login.cpp \
@@ -21,13 +19,11 @@ SOURCES = main.cpp \
     tcpclient.cpp \
     tcpserver.cpp
 HEADERS = mainwindow.h \
-    cabstractemojitable.h \
     changeheaderwnd.h \
     clientdatabase.h \
     clienttoserver.h \
     dragscrollarea.h \
     emojibar.h \
-    emojitab.h \
     filetransfer.h \
     global.h \
     listbar.h \

@@ -5,17 +5,29 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include "global.h"
+#include <QWidget>
+#include <QJsonObject>
+#include "profilemanager.h"
 
-class ClientDataBase
+
+class ClientDataBase: public QWidget
 {
+    Q_OBJECT
+
 public:
-    ClientDataBase();
+    explicit ClientDataBase(QWidget *parent = nullptr);
     bool connectDataBase(QString dbPath);//连接数据库
-    bool addContact(QJsonObject jsonMessage);//客户端存入联系人
-    bool getContact(QList<QJsonObject> &jsonMessageList);//客户端查询联系人
-    bool addMessage(QJsonObject jsonMessage);//客户端存入消息记录
-    bool getMessage(QString id, QList<QJsonObject> &jsonMessageList);//客户端输出消息记录
+    QMap<QString,Message> getMessage(QList<QJsonObject>);
+    void addProfile(profile new_connect);
+    int m_id;
+    void addMessage(QJsonObject jsonMessage);//客户端存入消息记录
+    QMap<QString, Message> getMessage();
+    QMap<QString, profile> getProfile();
     bool selectHistoryByData(QString id, QString dataPart, QList<QJsonObject> &jsonMessageList);//客户端查询消息记录
+
+signals:
+    void finish();
+
 private:
     QSqlDatabase db;
     QSqlQuery query;

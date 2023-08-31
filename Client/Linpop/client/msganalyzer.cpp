@@ -80,10 +80,6 @@ void MsgAnalyzer::sendError(QTcpSocket* socket,QString error){
     socket->write(jsonString.toUtf8());
 }
 
-void MsgAnalyzer::storeIntoDatabase(QJsonObject information){
-
-}
-
 void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
     QJsonDocument document=QJsonDocument::fromJson(message.toUtf8());
     if (!document.isNull()) {
@@ -95,6 +91,16 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
                 }
                 else
                     QMessageBox::information(nullptr, "Information", information["data"].toString());
+            }
+            if(information["function"].toString()=="information"){
+                if(information["size"]!=information["data"].toString().length())
+                    sendError(socket,"incomplete data");
+                else{
+                    information["id"]=QString::number(information["sender"].toInt());
+                    information["active"]=false;
+
+                    emit storeIntoDatabase(information);
+                }
             }
         } catch (const std::exception &e) {
             qDebug() << "Exception caught:" << e.what(); // 捕获并处理异常
@@ -123,6 +129,7 @@ void MsgAnalyzer::sendMessage(QTcpSocket *socket, QString function, message *msg
         obj["time"]=msg->time;
         obj["id"]=m_profile->m_id;
         obj["msg"]=msg->msg;
+        obj["isSender"]=0;
     }else{
         MYLOG<<"send with wrong function";
         return;
@@ -130,7 +137,7 @@ void MsgAnalyzer::sendMessage(QTcpSocket *socket, QString function, message *msg
     QJsonDocument json;
     json.setObject(obj);
     QByteArray byteArray = json.toJson(QJsonDocument::Compact);
-    MYLOG<<byteArray;
+    MYLOG<<"send: "<<byteArray;
     socket->write(byteArray);
 }
 
@@ -164,8 +171,9 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
     if (obj.contains("function")) {
         QString value = obj.value("function").toString();
         if(value == "init"){ // 初始化
-            if(!m_profile->m_contact.contains(id)){ // 新联系人
 
+            MYLOG<<"contact has: "<<m_profile->m_contact;
+            if(!m_profile->m_contact.contains(id)){ // 新联系人
                 m_profile->m_contactProfile.insert(id, profile());
                 m_profile->m_chatList.insert(id,Message());
             }
@@ -180,8 +188,10 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
             if(!m_profile->m_contact.contains(id)){
                 m_profile->m_contact.append(id); // 到这里才能添加
                 emit m_profile->addContact();
+                MYLOG <<"new contact: id=" <<id;
             }else{
                 emit m_profile->updateListBar();
+                MYLOG<<"contact had";
             }
         }else if (value == "message"){
             MYLOG<<"receive message from id "<<id;
@@ -189,6 +199,7 @@ void MsgAnalyzer::receiveMessage(QTcpSocket *socket, QByteArray msg, bool isServ
             msg.id = id;
             msg.msg = obj.value("msg").toString();
             msg.time = obj.value("time").toString();
+            msg.isSender = 0;
             emit m_profile->appendMsg(id, msg);
         }
     }

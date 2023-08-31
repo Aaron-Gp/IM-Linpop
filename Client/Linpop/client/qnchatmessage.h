@@ -1,6 +1,6 @@
 #ifndef QNCHATMESSAGE_H
 #define QNCHATMESSAGE_H
-
+#define QT_NO_DEBUG_OUTPUT
 #include <QWidget>
 #include "global.h"
 

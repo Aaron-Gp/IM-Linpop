@@ -2,6 +2,7 @@
 #include <qtmaterialavatar.h>
 #include "sidebar.h"
 #include <QToolButton>
+#include <QCheckBox>
 
 SideBar::SideBar(QWidget *parent) : QFrame(parent)
 {
@@ -68,11 +69,30 @@ void SideBar::setupToolBar()
     contactBtn->setIconSize(QSize(32,32));
     toolVector.append(contactBtn);
     actionTLayout->addWidget(contactBtn);
+
     QToolButton *p2pBtn = new QToolButton();
     p2pBtn->setIcon(QIcon(":/icons/p2p"));
     p2pBtn->setFixedSize(QSize(48,48));
     p2pBtn->setIconSize(QSize(32,32));
     toolVector.append(p2pBtn);
+    p2pBtn->setEnabled(false);
+
+    QCheckBox *p2pCkb = new QCheckBox();
+    p2pCkb->setText("p2p模式");
+    connect(p2pCkb, &QCheckBox::toggled,[=](bool checked){
+        if(checked){
+            m_profile->p2pMode=true;
+            p2pBtn->setEnabled(true);
+            MYLOG<<"open p2p mode";
+        }else{
+            m_profile->p2pMode=false;
+            MYLOG<<"close p2p mode";
+            p2pBtn->setEnabled(false);
+            //TODO
+        }
+    });
+    actionTLayout->addWidget(p2pCkb);
+
     actionTLayout->addWidget(p2pBtn);
     actionTLayout->addStretch();
     QToolButton *settingBtn = new QToolButton();

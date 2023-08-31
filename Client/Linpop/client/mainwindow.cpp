@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QNetworkInterface>
 #include "changeheaderwnd.h"
+#include "clienttoserver.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -67,13 +68,23 @@ void MainWindow::setUpUi()
     for(int i=0;i<m_sideBar->toolVector.size();i++){
         connect(m_sideBar->toolVector[i],&QToolButton::clicked,[=](){
             m_listBar->stackLLayout->setCurrentIndex(i);
+            if(i==0){
+                QListWidgetItem *item = m_listBar->messageWidget->currentItem();
+                if(item!=nullptr){
+                    QString c_id = item->data(Qt::UserRole).toString();
+                    m_mainBar->changeBar(c_id);
+                }
+            }
         });
     }
 
     // 聊天面板切换 checked
     connect(m_listBar->messageWidget,&QListWidget::currentRowChanged,[&](int row){
-        QString id = m_profile->m_contact[row];
-        m_mainBar->changeBar(id);
+        QListWidgetItem *item = m_listBar->messageWidget->currentItem();
+        if(item!=nullptr){
+            QString c_id = item->data(Qt::UserRole).toString();
+            m_mainBar->changeBar(c_id);
+        }
     });
 
     MYLOG<<"actions initialized!";
@@ -111,35 +122,40 @@ void MainWindow::setUpUi()
         }
     });
 
+    // receive
     connect(m_profile, &ProfileManager::appendMsg, [=](QString id, message msg){
+        m_profile->m_chatList[id].append(msg);
+        QJsonObject obj;
+        obj["id"]=id;obj["timestamp"]=msg.time;
+        obj["type"]="message";obj["data"]=msg.msg;
+        obj["isSender"]=msg.isSender;
+        m_profile->m_db->addMessage(obj);
+
         QListWidgetItem *item = m_listBar->messageWidget->currentItem();
         if(item!=nullptr){
             QString c_id = item->data(Qt::UserRole).toString();
-            m_profile->m_chatList[c_id].append(msg);
+
             MYLOG<<"compare "<<c_id<<" : " <<id;
             if(c_id==id){
                 m_mainBar->addMessage(msg);
                 MYLOG<<"add msg to main bar";
             }
-            QJsonObject obj;
-            obj["id"]=c_id;obj["timestamp"]=msg.time;
-            obj["type"]="message";obj["data"]=msg.msg;
-            obj["isSender"]=1;
-            m_profile->m_db->addMessage(obj);
         }
     });
 
     MYLOG<<"server initialized!";
 
-
     // 添加联系人
 
     connect(m_profile, &ProfileManager::addContact, [=](){
-        m_listBar->addContact(m_profile->m_contactProfile[m_profile->m_contact.last()]);
+        profile new_contact=m_profile->m_contactProfile[m_profile->m_contact.last()];
+        m_profile->m_db->addProfile(new_contact);
+        m_listBar->addContact(new_contact);
         int cnt = m_listBar->messageWidget->count();
         MYLOG<< cnt;
         m_listBar->messageWidget->setCurrentRow(cnt-1);
     });
+
 
     connect(m_profile, &ProfileManager::updateListBar, [=](){
         m_listBar->updateContactList();
@@ -154,22 +170,41 @@ void MainWindow::setUpUi()
 
             QString editorMsg = m_mainBar->m_chatEditor->toPlainText();
             m_mainBar->m_chatEditor->setText("");
-            QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+            int timestamp=QDateTime::currentDateTime().toTime_t();
+            QString time = QString::number(timestamp); //时间戳
             MYLOG<<"addMessage" << editorMsg << time;
             if(editorMsg != "") {
+                editorMsg.append(" ");
                 message msg;
                 msg.id=id;
                 msg.ip = m_profile->m_ip;
                 msg.msg = editorMsg;
                 msg.time = time;
+                msg.isSender = 1;
                 m_mainBar->addMessage(msg);
                 m_profile->m_chatList[id].append(msg);
                 QString data = editorMsg;
-                if(m_profile->useServer) // 使用服务端发送
-                    m_analyzer->sendMessage(m_server->m_tcpClient[remoteIp], "message", &msg);
-                else // 使用客户端发送
-                    m_analyzer->sendMessage(m_client->m_tcpClient[remoteIp],"message",&msg);
-                     // 从client连接池中找到对应ip的客户端并发送消息
+                if(m_profile->p2pMode){
+                    if(m_profile->useServer) // 使用服务端发送
+                        m_analyzer->sendMessage(m_server->m_tcpClient[remoteIp], "message", &msg);
+                    else // 使用客户端发送
+                        m_analyzer->sendMessage(m_client->m_tcpClient[remoteIp],"message",&msg);
+                         // 从client连接池中找到对应ip的客户端并发送消息
+                }
+                QJsonObject json;
+                json["id"]=id;
+                json["sender"]=m_profile->m_id.toInt();
+                json["receiver"]=id.toInt();
+                json["data"]=msg.msg;
+                json["function"]="information";
+                json["type"]="text";
+                json["timestamp"]=timestamp;
+                json["isSender"]=1;
+                json["size"]=msg.msg.length();
+                QJsonDocument jsonDoc(json);
+                QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+                m_profile->m_clientToServer->sendToServer(jsonString);
+                m_profile->m_db->addMessage(json);
             }
         }
     });
@@ -185,6 +220,12 @@ void MainWindow::setUpUi()
             chooseHeader->close();
         });
     });
+
+//    connect(m_profile->m_db,&ClientDataBase::finish,m_profile,&ProfileManager::updateMessage);
+
+//    connect(m_profile,&ProfileManager::update,m_mainBar,[&](){
+//        m_mainBar->changeBar();
+//    });
 
     MYLOG<<"all functions initialized!";
 
@@ -202,18 +243,8 @@ void MainWindow::rcvLogin()
     this->show();
     MYLOG<<"database: "<<DATABASE+m_profile->m_id+".db";
     m_profile->m_db->connectDataBase(DATABASE+m_profile->m_id+".db");
-//    m_profile->m_db->connectDataBase()
-    QList<QJsonObject> jsonMessageList;
-    m_profile->m_db->getContact(jsonMessageList);
-    foreach (QJsonObject jsonMessage, jsonMessageList) {
-        profile pf;
-        pf.id = jsonMessage["id"].toString();
-        pf.ip = jsonMessage["ip"].toString();
-        pf.name = jsonMessage["name"].toString();
-        pf.avatar = jsonMessage["avatar"].toString();
-        m_profile->m_contact.append(pf.id);
-        m_profile->m_contactProfile.insert(pf.id, pf);
-    }
+    m_profile->updateProfiles();
+    m_profile->updateMessage();
     emit closeLoginWindow();
 }
 
