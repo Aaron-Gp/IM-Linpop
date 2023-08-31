@@ -20,11 +20,12 @@ public:
     QMap<QString,Message> getMessage(QList<QJsonObject>);
     void addProfile(profile new_connect);
     int m_id;
-    void addMessage(QJsonObject jsonMessage);//客户端存入消息记录
+
     QMap<QString, Message> getMessage();
     QMap<QString, profile> getProfile();
     bool selectHistoryByData(QString id, QString dataPart, QList<QJsonObject> &jsonMessageList);//客户端查询消息记录
-
+public slots:
+    void addMessage(QJsonObject jsonMessage);//客户端存入消息记录
 signals:
     void finish();
 

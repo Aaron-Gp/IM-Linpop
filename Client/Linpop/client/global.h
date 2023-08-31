@@ -4,6 +4,7 @@
 #define SERVER QString("192.168.163.130")
 #define PORT 6666
 #define DATABASE QString("./data")
+#define FILEPATH QString("../FILE")
 
 #include <QDebug>
 #define MYLOG qDebug() << "[" << __FILE__ << ":" << __LINE__ << "]"

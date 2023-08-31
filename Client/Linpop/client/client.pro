@@ -7,6 +7,7 @@ SOURCES = main.cpp \
     clienttoserver.cpp \
     dragscrollarea.cpp \
     emojibar.cpp \
+    filemanager.cpp \
     filetransfer.cpp \
     listbar.cpp \
     login.cpp \
@@ -24,6 +25,7 @@ HEADERS = mainwindow.h \
     clienttoserver.h \
     dragscrollarea.h \
     emojibar.h \
+    filemanager.h \
     filetransfer.h \
     global.h \
     listbar.h \

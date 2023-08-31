@@ -40,7 +40,7 @@
      </font>
     </property>
     <property name="text">
-     <string>登录</string>
+     <string>Linpop</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

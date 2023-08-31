@@ -19,6 +19,8 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QNetworkInterface>
+#include <QFileDialog>
+#include <filemanager.h>
 #include "changeheaderwnd.h"
 #include "clienttoserver.h"
 
@@ -38,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     // WINDOW SETTING
     resize(1210,760);
     setFixedSize(1210,760);
-    setWindowTitle("Linpop");
+    setWindowTitle("Linpop Client");
 }
 
 MainWindow::~MainWindow()
@@ -145,6 +147,49 @@ void MainWindow::setUpUi()
 
     MYLOG<<"server initialized!";
 
+    connect(m_mainBar->fileBtn,&QToolButton::clicked,[=](){
+            QString selectedFile = QFileDialog::getOpenFileName(nullptr, "Select a file", "", "All Files (*)");
+            if(selectedFile.isEmpty()){
+                return;
+            }
+            int index = m_listBar->messageWidget->currentRow();
+            if(index>=0){
+                QString id = m_profile->m_contact[index];
+                QString remoteIp = m_profile->m_contactProfile[id].ip;
+                m_mainBar->m_chatEditor->setText("");
+                int timestamp=QDateTime::currentDateTime().toTime_t();
+                QString time = QString::number(timestamp); //时间戳
+                message msg;
+                msg.ip = m_profile->m_ip;
+                msg.msg = FileManager::ToString(selectedFile).append("\n");
+                msg.time = time;
+                msg.isSender=1;
+                m_mainBar->addMessage(msg);
+                m_profile->m_chatList[remoteIp].append(msg);
+                profile target=m_profile->m_contactProfile[id];
+                msg.ip=target.ip;
+                msg.id=target.id;
+                QJsonObject json;
+                json["id"]=id;
+                json["sender"]=m_profile->m_id.toInt();
+                json["receiver"]=QString(msg.id).toInt();
+                json["data"]=msg.msg;
+                json["function"]="information";
+                json["type"]="file";
+                json["timestamp"]=timestamp;
+                QFileInfo fileInfo(selectedFile);
+                QString fileName = fileInfo.fileName();
+                json["fileName"]=fileName;
+                json["isSender"]=1;
+                json["size"]=msg.msg.length();
+                QJsonDocument jsonDoc(json);
+                QString jsonString = "<?BEGIN?>"+jsonDoc.toJson(QJsonDocument::Compact)+"<?END?>";
+                qDebug()<<jsonString;
+                m_profile->m_clientToServer->sendToServer(jsonString);
+                m_profile->m_db->addMessage(json);
+            }
+        });
+
     // 添加联系人
 
     connect(m_profile, &ProfileManager::addContact, [=](){
@@ -221,11 +266,16 @@ void MainWindow::setUpUi()
         });
     });
 
-//    connect(m_profile->m_db,&ClientDataBase::finish,m_profile,&ProfileManager::updateMessage);
+    connect(this->m_profile->m_clientToServer->m_analyzer,&MsgAnalyzer::storeIntoDatabase,this->m_profile->m_db,&ClientDataBase::addMessage);
+    connect(m_profile->m_db,&ClientDataBase::finish,m_profile,&ProfileManager::updateMessage);
 
-//    connect(m_profile,&ProfileManager::update,m_mainBar,[&](){
-//        m_mainBar->changeBar();
-//    });
+    connect(m_profile,&ProfileManager::update,m_mainBar,[&](){
+        QListWidgetItem *item = m_listBar->messageWidget->currentItem();
+        if(item!=nullptr){
+            QString c_id = item->data(Qt::UserRole).toString();
+            m_mainBar->changeBar(c_id);
+        }
+    });
 
     MYLOG<<"all functions initialized!";
 

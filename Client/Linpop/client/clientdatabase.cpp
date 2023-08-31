@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QJsonObject>
+#include "filemanager.h"
 #include "profilemanager.h"
 
 ClientDataBase::ClientDataBase(QWidget *parent):QWidget(parent)
@@ -49,6 +50,8 @@ void ClientDataBase::addMessage(QJsonObject jsonMessage){
     QString type = jsonMessage["type"].toString();
     QString data = jsonMessage["data"].toString();
     int isSender = jsonMessage["isSender"].toInt();
+    if(type=="file")
+            data=FileManager::ToFile(jsonMessage["fileName"].toString(),id,isSender,data);
     qDebug()<<id<<timestamp<<type<<data<<isSender<<endl;
     query.prepare("INSERT INTO history VALUES (NULL, ?, ?, ?, ?, ?)");
     query.addBindValue(id);

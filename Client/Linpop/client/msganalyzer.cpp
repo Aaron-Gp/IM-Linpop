@@ -97,7 +97,7 @@ void MsgAnalyzer::anaylze(QTcpSocket* socket,QString message){
                     sendError(socket,"incomplete data");
                 else{
                     information["id"]=QString::number(information["sender"].toInt());
-                    information["active"]=false;
+                    information["isSender"]=false;
 
                     emit storeIntoDatabase(information);
                 }
